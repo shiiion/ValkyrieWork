@@ -2,12 +2,19 @@
 #include "valkAPI.h"
 #include "memory.h"
 #include "globals.h"
+#include "signaturelist.h"
+#include "playerlist.h"
+#include "csgoutils.h"
+#include "feature.h"
+#include "RenderPayload.h"
 #include <dwmapi.h>
 #include <d3d9.h>
 
 //signal close between threads
 static std::atomic_bool memThreadState;
 static std::atomic_bool mainThreadState;
+
+static std::mutex payloadMutex;
 
 //TEMPORARY!!
 using namespace valkyrie;
@@ -129,7 +136,7 @@ static auto renderFrame(DXObject<LPDIRECT3DDEVICE9> const& device) -> void
 
 	if (SUCCEEDED(device->BeginScene()))
 	{
-
+		
 		device->EndScene();
 	}
 
@@ -138,26 +145,46 @@ static auto renderFrame(DXObject<LPDIRECT3DDEVICE9> const& device) -> void
 
 static auto manageCSGOMemory() -> void
 {
-	auto const waitForGame = []() -> const DWORD
-	{
-		while (!ProcessMgr32::checkProcessExists("csgo.exe", true))
-		{
-			std::this_thread::sleep_for(std::chrono::seconds(5));
-		}
-		
-		return ProcessMgr32::getProcessIDList(false)["csgo.exe"];
-	};
-	
-	const DWORD csgoPID = waitForGame();
-	if (!csgoProc.openProcessById(csgoPID))
+	constexpr long threadSleepTime = 1;
+
+	waitForFn<5>(memThreadState, ProcessMgr32::checkProcessExists, "csgo.exe", true);
+	const DWORD csgoPID = ProcessMgr32::getProcessIDList(false).at("csgo.exe");
+
+	if (!csgoProc.openProcessById(csgoPID) ||
+		!tryFn<20, 7>(memThreadState, initializeGlobals))
 	{
 		mainThreadState = false;
 		return;
 	}
 
+	featureList.initFeatures();
+	//featureList.readFeatureConfig(...);
+
 	while (memThreadState.load() && csgoProc.isProcessRunning())
 	{
-		
+		if (signonStateInGame() && initializeDTOffsets())
+		{
+			playerList.readPlayers();
+
+			if (playerList.getLocalPlayer().base)
+			{
+				updateViewMatrix();
+
+				featureList.execAllFeatures();
+
+				copyBufferToPayload();
+			}
+			else
+			{
+				disablePayload();
+			}
+		}
+		else
+		{
+			disablePayload();
+		}
+
+		std::this_thread::sleep_for(std::chrono::milliseconds(threadSleepTime));
 	}
 }
 

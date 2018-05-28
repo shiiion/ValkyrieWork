@@ -86,6 +86,7 @@
       <ConformanceMode>true</ConformanceMode>
       <PreprocessorDefinitions>Development;%(PreprocessorDefinitions)</PreprocessorDefinitions>
       <AdditionalIncludeDirectories>C:\Program Files %28x86%29\Microsoft DirectX SDK %28June 2010%29\Include;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
+      <LanguageStandard>stdcpp17</LanguageStandard>
     </ClCompile>
     <Link>
       <AdditionalLibraryDirectories>C:\Program Files %28x86%29\Microsoft DirectX SDK %28June 2010%29\Lib\x64;%(AdditionalLibraryDirectories)</AdditionalLibraryDirectories>
@@ -120,19 +121,35 @@
     </Link>
   </ItemDefinitionGroup>
   <ItemGroup>
+    <ClCompile Include="CD3DFont.cpp" />
+    <ClCompile Include="csgoutils.cpp" />
+    <ClCompile Include="draw.cpp" />
+    <ClCompile Include="espfeature.cpp" />
+    <ClCompile Include="featurelist.cpp" />
     <ClCompile Include="globals.cpp" />
     <ClCompile Include="main.cpp" />
     <ClCompile Include="memory.cpp" />
+    <ClCompile Include="miscfeatures.cpp" />
     <ClCompile Include="netvarreader.cpp" />
-    <ClCompile Include="offsets.cpp" />
+    <ClCompile Include="playerlist.cpp" />
+    <ClCompile Include="Renderer.cpp" />
+    <ClCompile Include="RenderPayload.cpp" />
     <ClCompile Include="signaturelist.cpp" />
     <ClCompile Include="valkAPI.cpp" />
   </ItemGroup>
   <ItemGroup>
+    <ClInclude Include="CD3DFont.h" />
+    <ClInclude Include="csgoutils.h" />
+    <ClInclude Include="draw.h" />
+    <ClInclude Include="espfeatures.h" />
+    <ClInclude Include="feature.h" />
     <ClInclude Include="globals.h" />
     <ClInclude Include="memory.h" />
+    <ClInclude Include="miscfeatures.h" />
     <ClInclude Include="netvarreader.h" />
-    <ClInclude Include="offsets.h" />
+    <ClInclude Include="playerlist.h" />
+    <ClInclude Include="Renderer.h" />
+    <ClInclude Include="RenderPayload.h" />
     <ClInclude Include="res.h" />
     <ClInclude Include="signaturelist.h" />
     <ClInclude Include="valkAPI.h" />

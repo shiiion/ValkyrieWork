@@ -32,16 +32,16 @@ namespace valkyrie
 
 		auto printTables() const -> void;
 
-		auto tablesRead() const -> bool;
+		constexpr auto tablesRead() const -> bool;
 
-		RecvTable const& getTable(string const& className)
+		auto getTable(string const& className) const -> RecvTable const&
 		{
-			return classNameToTable[className];
+			return classNameToTable.at(className);
 		}
 
-		string const& getClassName(int classID)
+		auto getClassName(int classID) const -> string const&
 		{
-			return classIDToName[classID];
+			return classIDToName.at(classID);
 		}
 
 	private:

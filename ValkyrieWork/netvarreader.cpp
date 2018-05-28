@@ -93,7 +93,7 @@ namespace valkyrie
 		}
 	}
 
-	auto NetvarReader::tablesRead() const -> bool
+	constexpr auto NetvarReader::tablesRead() const -> bool
 	{
 		return _tablesRead;
 	}

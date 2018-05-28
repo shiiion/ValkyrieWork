@@ -31,8 +31,8 @@ namespace valkyrie
 		{
 			name = std::move(o.name);
 			memory = std::move(o.memory);
-			baseAddress = o.baseAddress;
-			moduleSize = o.moduleSize;
+			baseAddress = std::move(o.baseAddress);
+			moduleSize = std::move(o.moduleSize);
 
 			return *this;
 		}
@@ -56,26 +56,29 @@ namespace valkyrie
 
 	public:
 		static auto getProcessIDList(bool refresh)->map<string, DWORD> const&;
-		static auto checkProcessExists(string const& name, bool refresh) -> bool;
+		static auto checkProcessExists(string const& name, const bool refresh) -> bool;
 
 		ProcessMgr32();
 		ProcessMgr32(ProcessMgr32 const&) = delete;
 
-		auto openProcessById(DWORD pID) -> bool;
-		auto isInitialized() const -> bool;
+		auto openProcessById(const DWORD pID) -> bool;
+		auto isInitialized() const -> const bool;
 
 		//loads modules and copies their memory
 		auto loadModules() -> void;
 		auto getModule(string const& name) const -> Module const&;
 
 		//r/w, returns true on success
-		auto read(uint32_t address, uintptr_t buffer, size_t size) -> bool;
-		auto write(uint32_t address, uintptr_t buffer, size_t size) -> bool;
+		auto read(const uint32_t address, uintptr_t buffer, const size_t size) -> bool;
+		auto write(const uint32_t address, uintptr_t buffer, const size_t size) -> bool;
 
 		template<typename T>
-		auto read(uint32_t address, T* buffer, size_t length) -> bool;
+		auto read(const uint32_t address, T* buffer, const size_t length) -> bool;
 		template<typename T>
-		auto write(uint32_t address, T* buffer, size_t length) -> bool;
+		auto write(const uint32_t address, T* buffer, const size_t length) -> bool;
+
+		template<typename T>
+		auto read(const uint32_t address) -> T;
 
 		//returns badAddr if sig wasn't found
 		auto sigScan(string const& signature, string const& searchModule) const -> uint32_t;

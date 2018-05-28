@@ -32,11 +32,11 @@ namespace valkyrie
 	template<constexpr size_t T>
 	auto Signature<T>::getSigAddress(bool forceRescan) const -> uint32_t
 	{
-		const string targetModName_s = (targetModName == "" ? modName : targetModName);
 		if (cachedSig != badAddr && !forceRescan)
 		{
 			return cachedSig;
 		}
+		const string targetModName_s = (targetModName == "" ? modName : targetModName);
 		
 		for (SigPair_t const& pair : signatures)
 		{
@@ -100,9 +100,12 @@ namespace valkyrie
 		clientStateSigs.signatures[0] = SigPair_t("7C ?? A1 ?? ?? ?? ?? 83 B8", 0x03);
 		clientStateSigs.signatures[1] = SigPair_t("A1 ?? ?? ?? ?? 83 B8 ?? ?? ?? ?? 06 0F 94 C0 C3", 0x01);
 
-		isInGameSigs.modName = engine;
-		isInGameSigs.signatures[0] = SigPair_t("7C ?? A1 ?? ?? ?? ?? 83 B8", 0x09);
-		isInGameSigs.signatures[1] = SigPair_t("A1 ?? ?? ?? ?? 83 B8 ?? ?? ?? ?? 06 0F 94 C0 C3", 0x07);
+		isInGameOffsetSigs.modName = engine;
+		isInGameOffsetSigs.signatures[0] = SigPair_t("7C ?? A1 ?? ?? ?? ?? 83 B8", 0x09);
+		isInGameOffsetSigs.signatures[1] = SigPair_t("A1 ?? ?? ?? ?? 83 B8 ?? ?? ?? ?? 06 0F 94 C0 C3", 0x07);
+
+		maxPlayerOffsetSigs.modName = engine;
+		maxPlayerOffsetSigs.signatures[0] = SigPair_t("89 81 ? ? ? ? 8B 57 2C", 0x02);
 
 		localPlayerSigs.modName = client;
 		localPlayerSigs.checkFunction = pointerCheck;
@@ -141,10 +144,10 @@ namespace valkyrie
 		inputSystemOffsetSigs.readFunction = noRead;
 		inputSystemSigs.signatures[0] = SigPair_t("0F B6 87 ?? ?? ?? ?? 8D", 0x00);
 
-		CHLClientListVTableSigs.modName = client;
-		CHLClientListVTableSigs.readFunction = clientTableRead;
-		CHLClientListVTableSigs.checkFunction = pointerCheck;
-		CHLClientListVTableSigs.signatures[0] = SigPair_t("8B 08 56 68 C0", -0x68);
+		dataTable.modName = client;
+		dataTable.readFunction = clientTableRead;
+		dataTable.checkFunction = pointerCheck;
+		dataTable.signatures[0] = SigPair_t("8B 08 56 68 C0", -0x68);
 
 		dormantSigs.modName = client;
 		dormantSigs.signatures[0] = SigPair_t("83 79 ?? FF 74 ?? 8A 81 ?? ?? ?? ?? C3", 0x08);
@@ -182,7 +185,7 @@ namespace valkyrie
 		//unghetto me:
 		return entityListSigs.sanityCheckSigs() &&
 			clientStateSigs.sanityCheckSigs() &&
-			isInGameSigs.sanityCheckSigs() &&
+			isInGameOffsetSigs.sanityCheckSigs() &&
 			localPlayerSigs.sanityCheckSigs() &&
 			cRenderSigs.sanityCheckSigs() &&
 			viewAngleSigs.sanityCheckSigs() &&
@@ -190,7 +193,7 @@ namespace valkyrie
 			forceJumpSigs.sanityCheckSigs() &&
 			inputSystemSigs.sanityCheckSigs() &&
 			inputSystemOffsetSigs.sanityCheckSigs() &&
-			CHLClientListVTableSigs.sanityCheckSigs() &&
+			dataTable.sanityCheckSigs() &&
 			dormantSigs.sanityCheckSigs() &&
 			boneMatrixSigs.sanityCheckSigs() &&
 			modelHeaderSigs.sanityCheckSigs() &&

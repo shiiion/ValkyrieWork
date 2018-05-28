@@ -13,15 +13,30 @@
       <UniqueIdentifier>{67DA6AB6-F800-4c08-8B7A-83BB121AAD01}</UniqueIdentifier>
       <Extensions>rc;ico;cur;bmp;dlg;rc2;rct;bin;rgs;gif;jpg;jpeg;jpe;resx;tiff;tif;png;wav;mfcribbon-ms</Extensions>
     </Filter>
+    <Filter Include="Header Files\ESP">
+      <UniqueIdentifier>{0f6cadc3-10c4-477b-8ab0-f4380073d814}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Source Files\ESP">
+      <UniqueIdentifier>{82b1615f-8dfd-4966-9f12-2bc537aff333}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Header Files\self contained autism">
+      <UniqueIdentifier>{1d76e576-8434-4a4d-8af2-c9893cfb8394}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Source Files\self contained autism">
+      <UniqueIdentifier>{30fa9183-6b1c-4a8a-8c4b-31936ff61dff}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Source Files\Misc">
+      <UniqueIdentifier>{53d7332e-f2da-4c7d-80d6-e3b4ff2dee6e}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Header Files\Misc">
+      <UniqueIdentifier>{260cb8fa-36e7-488c-a7e7-848615fd5ab5}</UniqueIdentifier>
+    </Filter>
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="main.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
     <ClCompile Include="valkAPI.cpp">
-      <Filter>Source Files</Filter>
-    </ClCompile>
-    <ClCompile Include="offsets.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
     <ClCompile Include="netvarreader.cpp">
@@ -35,6 +50,33 @@
     </ClCompile>
     <ClCompile Include="signaturelist.cpp">
       <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="playerlist.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="csgoutils.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="featurelist.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="RenderPayload.cpp">
+      <Filter>Source Files\ESP</Filter>
+    </ClCompile>
+    <ClCompile Include="CD3DFont.cpp">
+      <Filter>Source Files\self contained autism</Filter>
+    </ClCompile>
+    <ClCompile Include="Renderer.cpp">
+      <Filter>Source Files\self contained autism</Filter>
+    </ClCompile>
+    <ClCompile Include="draw.cpp">
+      <Filter>Source Files\self contained autism</Filter>
+    </ClCompile>
+    <ClCompile Include="miscfeatures.cpp">
+      <Filter>Source Files\Misc</Filter>
+    </ClCompile>
+    <ClCompile Include="espfeature.cpp">
+      <Filter>Source Files\ESP</Filter>
     </ClCompile>
   </ItemGroup>
   <ItemGroup>
@@ -50,9 +92,6 @@
     <ClInclude Include="valkAPI.h">
       <Filter>Header Files</Filter>
     </ClInclude>
-    <ClInclude Include="offsets.h">
-      <Filter>Header Files</Filter>
-    </ClInclude>
     <ClInclude Include="netvarreader.h">
       <Filter>Header Files</Filter>
     </ClInclude>
@@ -61,6 +100,33 @@
     </ClInclude>
     <ClInclude Include="signaturelist.h">
       <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="playerlist.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="feature.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="csgoutils.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="RenderPayload.h">
+      <Filter>Header Files\ESP</Filter>
+    </ClInclude>
+    <ClInclude Include="Renderer.h">
+      <Filter>Header Files\self contained autism</Filter>
+    </ClInclude>
+    <ClInclude Include="draw.h">
+      <Filter>Header Files\self contained autism</Filter>
+    </ClInclude>
+    <ClInclude Include="CD3DFont.h">
+      <Filter>Header Files\self contained autism</Filter>
+    </ClInclude>
+    <ClInclude Include="miscfeatures.h">
+      <Filter>Header Files\Misc</Filter>
+    </ClInclude>
+    <ClInclude Include="espfeatures.h">
+      <Filter>Header Files\ESP</Filter>
     </ClInclude>
   </ItemGroup>
 </Project>

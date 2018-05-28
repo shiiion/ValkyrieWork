@@ -77,13 +77,6 @@ namespace valkyrie
 		return pidMap;
 	}
 
-	auto ProcessMgr32::checkProcessExists(string const& name, bool refresh) -> bool
-	{
-		getProcessIDList(refresh);
-
-		return pidMap.find(name) != pidMap.end();
-	}
-
 	ProcessMgr32::ProcessMgr32() 
 		: handle(INVALID_HANDLE_VALUE, CloseHandle), pID(0u)
 	{
@@ -91,7 +84,14 @@ namespace valkyrie
 		moduleMap["$modulenotfound"] = Module("$modulenotfound", badAddr, 0);
 	}
 
-	auto ProcessMgr32::openProcessById(DWORD pID) -> bool
+	auto ProcessMgr32::checkProcessExists(string const& name, const bool refresh) -> bool
+	{
+		getProcessIDList(refresh);
+
+		return pidMap.find(name) != pidMap.end();
+	}
+
+	auto ProcessMgr32::openProcessById(const DWORD pID) -> bool
 	{
 		this->pID = pID;
 		handle = std::move(WindowsHandle(OpenProcess(PROCESS_ALL_ACCESS, FALSE, pID), CloseHandle));
@@ -147,31 +147,39 @@ namespace valkyrie
 		}
 	}
 
-	bool ProcessMgr32::read(uint32_t address, uintptr_t buffer, size_t size)
+	auto ProcessMgr32::read(const uint32_t address, uintptr_t buffer, const size_t size) -> bool
 	{
 		size_t bytesRead = 0;
 		return ReadProcessMemory(handle.get(), reinterpret_cast<LPCVOID>(address), reinterpret_cast<LPVOID>(buffer), size, &bytesRead);
 	}
 
-	bool ProcessMgr32::write(uint32_t address, uintptr_t buffer, size_t size)
+	auto ProcessMgr32::write(const uint32_t address, uintptr_t buffer, const size_t size) -> bool
 	{
 		size_t bytesWritten = 0;
 		return WriteProcessMemory(handle.get(), reinterpret_cast<LPVOID>(address), reinterpret_cast<LPVOID>(buffer), size, &bytesWritten);
 	}
 
 	template<typename T>
-	bool ProcessMgr32::read(uint32_t address, T* buffer, size_t length)
+	auto ProcessMgr32::read(const uint32_t address, T* buffer, const size_t length) -> bool
 	{
 		return read(address, static_cast<uintptr_t>(buffer), length * sizeof(T));
 	}
 
 	template<typename T>
-	bool ProcessMgr32::write(uint32_t address, T* buffer, size_t length)
+	auto ProcessMgr32::write(const uint32_t address, T* buffer, const size_t length) -> bool
 	{
 		return write(address, static_cast<uintptr_t>(buffer), length * sizeof(T));
 	}
 
-	bool ProcessMgr32::isInitialized() const
+	template<typename T>
+	auto ProcessMgr32::read(const uint32_t address) -> T
+	{
+		T buffer;
+		read(address, static_cast<uintptr_t>(&buffer), sizeof(T));
+		return buffer;
+	}
+
+	auto ProcessMgr32::isInitialized() const -> const bool
 	{
 		return handle.get() != INVALID_HANDLE_VALUE && pID != 0u;
 	}

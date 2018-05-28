@@ -32,12 +32,13 @@ namespace valkyrie
 		inline auto sanityCheckSigs() const -> bool;
 		auto getSigAddress(bool forceRescan = false) const -> uint32_t;
 	private:
-		uint32_t cachedSig = badAddr;
+		mutable uint32_t cachedSig = badAddr;
 	};
 
 	Signature<3> entityListSigs;
 	Signature<2> clientStateSigs;
-	Signature<2> isInGameSigs;
+	Signature<2> isInGameOffsetSigs;
+	Signature<1> maxPlayerOffsetSigs;
 	Signature<1> localPlayerSigs;
 	Signature<1> localPlayerOffsetSigs;
 	Signature<2> cRenderSigs;
@@ -46,7 +47,7 @@ namespace valkyrie
 	Signature<2> forceJumpSigs;
 	Signature<2> inputSystemSigs;
 	Signature<2> inputSystemOffsetSigs;
-	Signature<1> CHLClientListVTableSigs;
+	Signature<1> dataTable;
 	Signature<1> dormantSigs;
 	Signature<2> boneMatrixSigs;
 	Signature<2> modelHeaderSigs;

@@ -37,7 +37,7 @@ namespace valkyrie
 	};
 
 	template<typename T>
-	inline auto range(T val, T low, T high) -> bool
+	constexpr auto range(const T val, const T low, const T high) -> bool
 	{
 		return (val <= high) && (val >= low);
 	}
@@ -58,4 +58,5 @@ namespace valkyrie
 
 	//source-like matrix4x4
 	typedef float matrix_t[16];
+	typedef float* pmatrix_t;
 }
