@@ -31,6 +31,12 @@
     <Filter Include="Header Files\Misc">
       <UniqueIdentifier>{260cb8fa-36e7-488c-a7e7-848615fd5ab5}</UniqueIdentifier>
     </Filter>
+    <Filter Include="Header Files\Aimbot">
+      <UniqueIdentifier>{a87eabf3-328b-45cf-a470-81f90a6aa14d}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Source Files\Aimbot">
+      <UniqueIdentifier>{33a718df-be35-4954-a991-8734672d042e}</UniqueIdentifier>
+    </Filter>
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="main.cpp">
@@ -77,6 +83,9 @@
     </ClCompile>
     <ClCompile Include="espfeature.cpp">
       <Filter>Source Files\ESP</Filter>
+    </ClCompile>
+    <ClCompile Include="aimbotfeatures.cpp">
+      <Filter>Source Files\Aimbot</Filter>
     </ClCompile>
   </ItemGroup>
   <ItemGroup>
@@ -127,6 +136,9 @@
     </ClInclude>
     <ClInclude Include="espfeatures.h">
       <Filter>Header Files\ESP</Filter>
+    </ClInclude>
+    <ClInclude Include="aimbotfeatures.h">
+      <Filter>Header Files\Aimbot</Filter>
     </ClInclude>
   </ItemGroup>
 </Project>
