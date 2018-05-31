@@ -149,7 +149,7 @@
     <ClInclude Include="netvarreader.h" />
     <ClInclude Include="playerlist.h" />
     <ClInclude Include="Renderer.h" />
-    <ClInclude Include="RenderPayload.h" />
+    <ClInclude Include="renderpayload.h" />
     <ClInclude Include="res.h" />
     <ClInclude Include="signaturelist.h" />
     <ClInclude Include="valkAPI.h" />

@@ -110,9 +110,6 @@
     <ClInclude Include="csgoutils.h">
       <Filter>Header Files</Filter>
     </ClInclude>
-    <ClInclude Include="RenderPayload.h">
-      <Filter>Header Files\ESP</Filter>
-    </ClInclude>
     <ClInclude Include="Renderer.h">
       <Filter>Header Files\self contained autism</Filter>
     </ClInclude>
@@ -126,6 +123,9 @@
       <Filter>Header Files\Misc</Filter>
     </ClInclude>
     <ClInclude Include="espfeatures.h">
+      <Filter>Header Files\ESP</Filter>
+    </ClInclude>
+    <ClInclude Include="renderpayload.h">
       <Filter>Header Files\ESP</Filter>
     </ClInclude>
   </ItemGroup>

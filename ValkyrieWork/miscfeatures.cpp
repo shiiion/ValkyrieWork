@@ -15,7 +15,7 @@ namespace valkyrie
 	auto SpamChatFeature::execFeature() const -> void
 	{
 		const uint32_t tickTime = static_cast<uint32_t>(GetTickCount());
-		if (setting() == 1ui8 && (tickTime - lastTickMessage) > spamTimerTicks)
+		if (setting() == 1u && (tickTime - lastTickMessage) > spamTimerTicks)
 		{
 			CSPlayer const& local = playerList.getLocalPlayer();
 			bool foundTarget = false;
@@ -68,7 +68,7 @@ namespace valkyrie
 		CSPlayer const& local = playerList.getLocalPlayer();
 		ESPPayload& buffer = getPayloadBuffer();
 
-		if (setting() == 1ui8 && !local.isDead)
+		if (setting() == 1u && !local.isDead)
 		{
 			const float startTime = timeSeconds();
 			uint32_t count;
@@ -138,7 +138,7 @@ namespace valkyrie
 	{
 		CSPlayer const& local = playerList.getLocalPlayer();
 
-		if (setting() == 1ui8 && 
+		if (setting() == 1u && 
 			isChatClosed() &&
 			checkKeyState(8, 1) &&
 			!local.isDead)

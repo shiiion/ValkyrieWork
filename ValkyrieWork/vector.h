@@ -4,6 +4,7 @@
 
 namespace valkyrie
 {
+
 	struct vec2
 	{
 		float x, y;
@@ -41,9 +42,15 @@ namespace valkyrie
 			return x * other.x + y * other.y;
 		}
 
-		auto distance(vec2 const& other) const -> float
+		inline auto distance(vec2 const& other) const -> float
 		{
 			return sqrt(dot(*this - other));
+		}
+
+		inline auto rotate(const float angle) const -> vec2
+		{
+			const float cos = cosf(angle), sin = sinf(angle);
+			return vec2(y * cos - x * sin, x * cos + y * sin);
 		}
 	};
 
@@ -92,6 +99,11 @@ namespace valkyrie
 		inline auto distance(vec3 const& other) const -> float
 		{
 			return (*this - other).mag();
+		}
+
+		inline auto xyRotation() const -> float
+		{
+			return atan2f(y, x);
 		}
 	};
 }

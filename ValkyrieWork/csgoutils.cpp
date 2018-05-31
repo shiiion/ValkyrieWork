@@ -201,7 +201,7 @@ namespace valkyrie
 		}
 	}
 
-	auto getViewMatrix() -> const pmatrix_t
+	constexpr auto getViewMatrix() -> const pmatrix_t
 	{
 		return static_cast<const pmatrix_t>(viewMatrix);
 	}

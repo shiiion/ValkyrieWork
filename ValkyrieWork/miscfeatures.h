@@ -17,6 +17,8 @@ namespace valkyrie
 
 		static constexpr uint32_t spamTimerTicks = 1100u;
 	public:
+		SpamChatFeature(FeatureSet* fs) : Feature(fs) {}
+
 		auto execFeature() const -> void;
 		auto getFeatureName() const -> string const& { return "Chat Spam"; }
 
@@ -40,6 +42,8 @@ namespace valkyrie
 		static constexpr uint32_t maxHitsPerExec = 64u;
 
 	public:
+		HitMarkerFeature(FeatureSet* fs) : Feature(fs) {}
+
 		auto execFeature() const -> void;
 		auto getFeatureName() const -> string const& { return "Hitmarkers"; }
 
@@ -48,11 +52,26 @@ namespace valkyrie
 
 	class BunnyhopFeature : public Feature
 	{
-	private:
 	public:
+		BunnyhopFeature(FeatureSet* fs) : Feature(fs) {}
 		auto execFeature() const -> void;
 		auto getFeatureName() const -> string const& { return "Bunnyhop"; }
 
 		~BunnyhopFeature() {}
+	};
+
+	class MiscFeatureSet : public FeatureSet
+	{
+	public:
+		MiscFeatureSet()
+		{
+			features["Chat Spam"] = new SpamChatFeature(this);
+			features["Hitmarkers"] = new HitMarkerFeature(this);
+			features["Bunnyhop"] = new BunnyhopFeature(this);
+			//default enabled, should not be disabled
+			setEnabled(true);
+		}
+
+		auto getFeatureSetName() const -> string const& { return "Miscellaneous"; }
 	};
 }

@@ -21,5 +21,5 @@ namespace valkyrie
 	auto sendUserCmd(string const& command) -> bool;
 
 	auto updateViewMatrix() -> void;
-	auto getViewMatrix() -> const pmatrix_t;
+	constexpr auto getViewMatrix() -> const pmatrix_t;
 }
