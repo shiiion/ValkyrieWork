@@ -121,6 +121,7 @@
     </Link>
   </ItemDefinitionGroup>
   <ItemGroup>
+    <ClCompile Include="aimbotfeatures.cpp" />
     <ClCompile Include="CD3DFont.cpp" />
     <ClCompile Include="csgoutils.cpp" />
     <ClCompile Include="draw.cpp" />
@@ -138,6 +139,7 @@
     <ClCompile Include="valkAPI.cpp" />
   </ItemGroup>
   <ItemGroup>
+    <ClInclude Include="aimbotfeatures.h" />
     <ClInclude Include="CD3DFont.h" />
     <ClInclude Include="csgoutils.h" />
     <ClInclude Include="draw.h" />
