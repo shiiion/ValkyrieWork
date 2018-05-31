@@ -134,7 +134,7 @@
     <ClCompile Include="netvarreader.cpp" />
     <ClCompile Include="playerlist.cpp" />
     <ClCompile Include="Renderer.cpp" />
-    <ClCompile Include="RenderPayload.cpp" />
+    <ClCompile Include="renderpayload.cpp" />
     <ClCompile Include="signaturelist.cpp" />
     <ClCompile Include="valkAPI.cpp" />
   </ItemGroup>
