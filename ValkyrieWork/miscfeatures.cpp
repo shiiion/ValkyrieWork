@@ -124,6 +124,11 @@ namespace valkyrie
 				{
 					worldToScreen(it1->loc, *it2, viewMatrix);
 				}
+
+				if (newHit)
+				{
+					//TODO: make sound here
+				}
 			}
 		}
 		else //constantly update hitcount

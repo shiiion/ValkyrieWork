@@ -1,14 +1,19 @@
 #include "res.h"
+#include "globals.h"
+
 #include "valkAPI.h"
 #include "memory.h"
-#include "globals.h"
 #include "signaturelist.h"
 #include "playerlist.h"
 #include "csgoutils.h"
+
 #include "feature.h"
 #include "RenderPayload.h"
+#include "esprendering.h"
+
+#include "Renderer.h"
+
 #include <dwmapi.h>
-#include <d3d9.h>
 
 //signal close between threads
 static std::atomic_bool memThreadState;
@@ -77,7 +82,8 @@ static auto createD3DWindow(string const& title) -> WindowTuple_t
 			DestroyWindow(hwnd);
 			break;
 		case WM_DESTROY:
-			PostQuitMessage(0);
+			//re-enable if not closing...
+			//PostQuitMessage(0);
 			break;
 		default:
 			return DefWindowProc(hwnd, message, wParam, lParam);
@@ -132,11 +138,27 @@ static auto pplifyMe() -> bool
 
 static auto renderFrame(DXObject<LPDIRECT3DDEVICE9> const& device) -> void
 {
+	ESPPayload payload;
+
 	device->Clear(0, nullptr, D3DCLEAR_TARGET, 0, 1.0f, 0);
 
 	if (SUCCEEDED(device->BeginScene()))
 	{
-		
+		renderer::pRenderer->Create(device.get());
+		renderer::pRenderer->Begin();
+
+		copyOutPayload(payload);
+
+		if (payload.shouldDraw)
+		{
+			renderer::drawESP(payload);
+		}
+		if (payload.drawHitpoints)
+		{
+			renderer::drawHitmarkers(payload);
+		}
+
+		renderer::pRenderer->End();
 		device->EndScene();
 	}
 

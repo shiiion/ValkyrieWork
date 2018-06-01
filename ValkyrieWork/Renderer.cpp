@@ -86,12 +86,12 @@ namespace renderer
 		pSprite->End();
 	}
 
-	VOID CRenderer::DrawString(wchar_t *text, float x, float y, int orientation, bool bordered, DWORD color, DWORD bcolor)
+	VOID CRenderer::DrawString(wchar_t const* text, float x, float y, int orientation, bool bordered, DWORD color, DWORD bcolor)
 	{
 		pDrawer->DrawString(text, x, y, orientation, bordered, color, bcolor);
 	}
 
-	VOID CRenderer::DrawString(char *text, float x, float y, int orientation, bool bordered, DWORD color, DWORD bcolor)
+	VOID CRenderer::DrawString(char const* text, float x, float y, int orientation, bool bordered, DWORD color, DWORD bcolor)
 	{
 		pDrawer->DrawString(text, x, y, orientation, bordered, color, bcolor);
 	}
@@ -114,34 +114,6 @@ namespace renderer
 
 		pDevice->SetTexture(0, nullptr);
 		pDevice->DrawPrimitiveUP(D3DPT_TRIANGLESTRIP, 2, VertexList, sizeof(CVertexList));
-	}
-
-	VOID CRenderer::DrawLine(FLOAT X, FLOAT Y, FLOAT X2, FLOAT Y2, DWORD dColor, FLOAT distance)
-	{
-		D3DXVECTOR2 vLine[2];
-		pLine->SetAntialias(1);
-
-
-		//float minWidth = 0.5f, maxWidth = 2.5f;
-		float minWidth = 0.5f, maxWidth = 2.5f;
-		float maxDist = 1700, minDist = 100;
-
-		distance = min(maxDist, max(distance, minDist));
-		float distanceScalar = (maxDist - distance) / (maxDist - minDist);
-
-		float width = (maxWidth - minWidth) * distanceScalar + minWidth;
-
-		pLine->SetWidth(width);
-
-		pLine->Begin();
-
-		vLine[0][0] = X;
-		vLine[0][1] = Y;
-		vLine[1][0] = X2;
-		vLine[1][1] = Y2;
-
-		pLine->Draw(vLine, 2, dColor);
-		pLine->End();
 	}
 
 	VOID CRenderer::DrawBorderLine(FLOAT X, FLOAT Y, FLOAT X2, FLOAT Y2, DWORD dColor, FLOAT distance)
@@ -172,7 +144,7 @@ namespace renderer
 		pLine->End();
 	}
 
-	VOID CRenderer::DrawLineWithThickness(FLOAT X, FLOAT Y, FLOAT X2, FLOAT Y2, DWORD dColor, FLOAT thickness)
+	VOID CRenderer::DrawLine(FLOAT X, FLOAT Y, FLOAT X2, FLOAT Y2, DWORD dColor, FLOAT thickness)
 	{
 		D3DXVECTOR2 vLine[2];
 		pLine->SetAntialias(1);
@@ -270,14 +242,14 @@ namespace renderer
 	{
 		//DrawRect(X - Width, Y - 0.5f, (Width * 2.0f), 1.0f, dColor);
 		//DrawRect(X - 0.5f, Y - Height, 1.0f, (Height * 2.0f), dColor);
-		DrawLineWithThickness(X - Width - 1, Y - Height - 1, X - 1, Y - 1, Black, 5);
-		DrawLineWithThickness(X + Width + 1, Y - Height - 1, X + 1, Y - 1, Black, 5);
-		DrawLineWithThickness(X + Width + 1, Y + Height + 1, X + 1, Y + 1, Black, 5);
-		DrawLineWithThickness(X - Width - 1, Y + Height + 1, X - 1, Y + 1, Black, 5);
-		DrawLineWithThickness(X - Width, Y - Height, X - 2, Y - 2, dColor, 1);
-		DrawLineWithThickness(X + Width, Y - Height, X + 2, Y - 2, dColor, 1);
-		DrawLineWithThickness(X + Width, Y + Height, X + 2, Y + 2, dColor, 1);
-		DrawLineWithThickness(X - Width, Y + Height, X - 2, Y + 2, dColor, 1);
+		DrawLine(X - Width - 1, Y - Height - 1, X - 1, Y - 1, Black, 5);
+		DrawLine(X + Width + 1, Y - Height - 1, X + 1, Y - 1, Black, 5);
+		DrawLine(X + Width + 1, Y + Height + 1, X + 1, Y + 1, Black, 5);
+		DrawLine(X - Width - 1, Y + Height + 1, X - 1, Y + 1, Black, 5);
+		DrawLine(X - Width, Y - Height, X - 2, Y - 2, dColor, 1);
+		DrawLine(X + Width, Y - Height, X + 2, Y - 2, dColor, 1);
+		DrawLine(X + Width, Y + Height, X + 2, Y + 2, dColor, 1);
+		DrawLine(X - Width, Y + Height, X - 2, Y + 2, dColor, 1);
 	}
 
 	VOID CRenderer::DrawCrosshair(DWORD dColor1)

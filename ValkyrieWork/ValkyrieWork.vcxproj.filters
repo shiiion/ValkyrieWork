@@ -1,28 +1,7 @@
 ﻿<?xml version="1.0" encoding="utf-8"?>
 <Project ToolsVersion="4.0" xmlns="http://schemas.microsoft.com/developer/msbuild/2003">
   <ItemGroup>
-    <ClCompile Include="csgoutils.cpp">
-      <Filter>Source Files</Filter>
-    </ClCompile>
-    <ClCompile Include="globals.cpp">
-      <Filter>Source Files</Filter>
-    </ClCompile>
     <ClCompile Include="main.cpp">
-      <Filter>Source Files</Filter>
-    </ClCompile>
-    <ClCompile Include="memory.cpp">
-      <Filter>Source Files</Filter>
-    </ClCompile>
-    <ClCompile Include="netvarreader.cpp">
-      <Filter>Source Files</Filter>
-    </ClCompile>
-    <ClCompile Include="playerlist.cpp">
-      <Filter>Source Files</Filter>
-    </ClCompile>
-    <ClCompile Include="signaturelist.cpp">
-      <Filter>Source Files</Filter>
-    </ClCompile>
-    <ClCompile Include="valkAPI.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
     <ClCompile Include="aimbotfeatures.cpp">
@@ -38,27 +17,51 @@
       <Filter>Source Files\Features\ESP</Filter>
     </ClCompile>
     <ClCompile Include="CD3DFont.cpp">
-      <Filter>Source Files\Bad Stuff %28Renderer%29</Filter>
+      <Filter>Source Files\Bad/Old Stuff %28renderer/menu%29</Filter>
     </ClCompile>
     <ClCompile Include="draw.cpp">
-      <Filter>Source Files\Bad Stuff %28Renderer%29</Filter>
+      <Filter>Source Files\Bad/Old Stuff %28renderer/menu%29</Filter>
     </ClCompile>
     <ClCompile Include="Renderer.cpp">
-      <Filter>Source Files\Bad Stuff %28Renderer%29</Filter>
+      <Filter>Source Files\Bad/Old Stuff %28renderer/menu%29</Filter>
     </ClCompile>
     <ClCompile Include="featurelist.cpp">
       <Filter>Source Files\Features</Filter>
     </ClCompile>
+    <ClCompile Include="csgoutils.cpp">
+      <Filter>Source Files\Util</Filter>
+    </ClCompile>
+    <ClCompile Include="memory.cpp">
+      <Filter>Source Files\Util</Filter>
+    </ClCompile>
+    <ClCompile Include="netvarreader.cpp">
+      <Filter>Source Files\Util</Filter>
+    </ClCompile>
+    <ClCompile Include="playerlist.cpp">
+      <Filter>Source Files\Util</Filter>
+    </ClCompile>
+    <ClCompile Include="valkAPI.cpp">
+      <Filter>Source Files\Util</Filter>
+    </ClCompile>
+    <ClCompile Include="globals.cpp">
+      <Filter>Source Files\Global</Filter>
+    </ClCompile>
+    <ClCompile Include="signaturelist.cpp">
+      <Filter>Source Files\Util</Filter>
+    </ClCompile>
+    <ClCompile Include="esprendering.cpp">
+      <Filter>Source Files\Features\ESP</Filter>
+    </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="CD3DFont.h">
-      <Filter>Source Files\Bad Stuff %28Renderer%29</Filter>
+      <Filter>Source Files\Bad/Old Stuff %28renderer/menu%29</Filter>
     </ClInclude>
     <ClInclude Include="Renderer.h">
-      <Filter>Source Files\Bad Stuff %28Renderer%29</Filter>
+      <Filter>Source Files\Bad/Old Stuff %28renderer/menu%29</Filter>
     </ClInclude>
     <ClInclude Include="draw.h">
-      <Filter>Source Files\Bad Stuff %28Renderer%29</Filter>
+      <Filter>Source Files\Bad/Old Stuff %28renderer/menu%29</Filter>
     </ClInclude>
     <ClInclude Include="espfeatures.h">
       <Filter>Source Files\Features\ESP</Filter>
@@ -75,32 +78,35 @@
     <ClInclude Include="miscfeatures.h">
       <Filter>Source Files\Features\Misc</Filter>
     </ClInclude>
-    <ClInclude Include="vector.h">
-      <Filter>Source Files</Filter>
-    </ClInclude>
     <ClInclude Include="csgoutils.h">
-      <Filter>Source Files</Filter>
-    </ClInclude>
-    <ClInclude Include="globals.h">
-      <Filter>Source Files</Filter>
+      <Filter>Source Files\Util</Filter>
     </ClInclude>
     <ClInclude Include="memory.h">
-      <Filter>Source Files</Filter>
+      <Filter>Source Files\Util</Filter>
     </ClInclude>
     <ClInclude Include="netvarreader.h">
-      <Filter>Source Files</Filter>
+      <Filter>Source Files\Util</Filter>
     </ClInclude>
     <ClInclude Include="playerlist.h">
-      <Filter>Source Files</Filter>
-    </ClInclude>
-    <ClInclude Include="res.h">
-      <Filter>Source Files</Filter>
-    </ClInclude>
-    <ClInclude Include="signaturelist.h">
-      <Filter>Source Files</Filter>
+      <Filter>Source Files\Util</Filter>
     </ClInclude>
     <ClInclude Include="valkAPI.h">
-      <Filter>Source Files</Filter>
+      <Filter>Source Files\Util</Filter>
+    </ClInclude>
+    <ClInclude Include="vector.h">
+      <Filter>Source Files\Util</Filter>
+    </ClInclude>
+    <ClInclude Include="res.h">
+      <Filter>Source Files\Global</Filter>
+    </ClInclude>
+    <ClInclude Include="globals.h">
+      <Filter>Source Files\Global</Filter>
+    </ClInclude>
+    <ClInclude Include="signaturelist.h">
+      <Filter>Source Files\Util</Filter>
+    </ClInclude>
+    <ClInclude Include="esprendering.h">
+      <Filter>Source Files\Features\ESP</Filter>
     </ClInclude>
   </ItemGroup>
   <ItemGroup>
@@ -119,7 +125,13 @@
     <Filter Include="Source Files\Features\Misc">
       <UniqueIdentifier>{04de1d62-07b0-4b0b-a7dc-6dfedd7ac264}</UniqueIdentifier>
     </Filter>
-    <Filter Include="Source Files\Bad Stuff %28Renderer%29">
+    <Filter Include="Source Files\Util">
+      <UniqueIdentifier>{b795ec3f-24b7-4ab3-b8d2-69cc6d2f8555}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Source Files\Global">
+      <UniqueIdentifier>{15280a91-4015-4015-83f5-c741294f6365}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Source Files\Bad/Old Stuff %28renderer/menu%29">
       <UniqueIdentifier>{63f66caa-229c-4dec-adac-fa5ee1c14701}</UniqueIdentifier>
     </Filter>
   </ItemGroup>

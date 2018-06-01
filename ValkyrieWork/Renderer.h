@@ -56,16 +56,16 @@ namespace renderer
 
 	struct hsv
 	{
-		double h;
-		double s;
-		double v;
+		float h;
+		float s;
+		float v;
 	};
 
 	struct rgb
 	{
-		double r; // a fraction between 0 and 1
-		double g; // a fraction between 0 and 1
-		double b; // a fraction between 0 and 1
+		float r; // a fraction between 0 and 1
+		float g; // a fraction between 0 and 1
+		float b; // a fraction between 0 and 1
 	};
 
 	class CVertexList
@@ -86,8 +86,7 @@ namespace renderer
 		VOID DrawRect(FLOAT X, FLOAT Y, FLOAT Width, FLOAT Height, D3DCOLOR dColor);
 		VOID DrawGradientRect(FLOAT X, FLOAT Y, FLOAT Width, FLOAT Height, D3DCOLOR dColor1, D3DCOLOR dColor2);
 		VOID DrawGradientRect2(FLOAT X, FLOAT Y, FLOAT Width, FLOAT Height, D3DCOLOR dColor1, D3DCOLOR dColor2);
-		VOID DrawLine(FLOAT X, FLOAT Y, FLOAT X2, FLOAT Y2, DWORD dColor, FLOAT distance);
-		VOID DrawLineWithThickness(FLOAT X, FLOAT Y, FLOAT X2, FLOAT Y2, DWORD dColor, FLOAT thickness);
+		VOID DrawLine(FLOAT X, FLOAT Y, FLOAT X2, FLOAT Y2, DWORD dColor, FLOAT thickness);
 		VOID DrawBorderLine(FLOAT X, FLOAT Y, FLOAT X2, FLOAT Y2, DWORD dColor, FLOAT distance);
 		VOID DrawCircle(FLOAT X, FLOAT Y, FLOAT Radius, FLOAT Sides, DWORD dColor1);
 		VOID DrawBox(FLOAT X, FLOAT Y, FLOAT Width, FLOAT Height, FLOAT fSize, D3DCOLOR dColor);
@@ -103,8 +102,8 @@ namespace renderer
 		VOID DrawTabOpen(FLOAT BaseX, FLOAT BaseY, FLOAT BaseW, FLOAT BaseH, D3DCOLOR dColor1, D3DCOLOR dColor2);
 		VOID
 			DrawButton(FLOAT BaseX, FLOAT BaseY, FLOAT BaseW, FLOAT BaseH, D3DCOLOR dColor1, D3DCOLOR dColor2, D3DCOLOR dColor3);
-		VOID DrawString(wchar_t* text, float x, float y, int orientation, bool bordered, DWORD color, DWORD bcolor = 0);
-		VOID DrawString(char* text, float x, float y, int orientation, bool bordered, DWORD color, DWORD bcolor = 0);
+		VOID DrawString(wchar_t const* text, float x, float y, int orientation, bool bordered, DWORD color, DWORD bcolor = 0);
+		VOID DrawString(char const* text, float x, float y, int orientation, bool bordered, DWORD color, DWORD bcolor = 0);
 
 		hsv rgb2hsv(rgb in);
 		rgb hsv2rgb(hsv in);
