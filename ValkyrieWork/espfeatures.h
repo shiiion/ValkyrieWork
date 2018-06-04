@@ -84,18 +84,6 @@ namespace valkyrie
 		auto getFeatureName() const -> string const& { return featureName; }
 	};
 
-	class GlowEsp : public EspFeature
-	{
-	private:
-		static string featureName;
-		static constexpr float newSensorTime = 50000000.f;
-		static constexpr uint8_t settingEnabled = 1ui8;
-	public:
-		GlowEsp(FeatureSet* fs) : EspFeature(fs) {}
-		auto execFeature() const -> void;
-		auto getFeatureName() const -> string const& { return featureName; }
-	};
-
 
 
 	class EspFeatureSet : public FeatureSet
@@ -115,7 +103,6 @@ namespace valkyrie
 			features["Name ESP"] = new NameEsp(this);
 			features["Distance ESP"] = new DistanceEsp(this);
 			features["Weapon ESP"] = new WeaponEsp(this);
-			features["Glow ESP"] = new GlowEsp(this);
 		}
 
 		auto getFeatureSetName() const -> string const& { return setName; }

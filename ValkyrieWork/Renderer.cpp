@@ -119,7 +119,7 @@ namespace renderer
 	VOID CRenderer::DrawBorderLine(FLOAT X, FLOAT Y, FLOAT X2, FLOAT Y2, DWORD dColor, FLOAT distance)
 	{
 		D3DXVECTOR2 vLine[2];
-		pLine->SetAntialias(1);
+		pLine->SetAntialias(0);
 
 
 		//float minWidth = 2.7f, maxWidth = 5.7f;
@@ -147,7 +147,7 @@ namespace renderer
 	VOID CRenderer::DrawLine(FLOAT X, FLOAT Y, FLOAT X2, FLOAT Y2, DWORD dColor, FLOAT thickness)
 	{
 		D3DXVECTOR2 vLine[2];
-		pLine->SetAntialias(1);
+		pLine->SetAntialias(0);
 
 		pLine->SetWidth(thickness);
 

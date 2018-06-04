@@ -195,7 +195,7 @@ namespace valkyrie
 			csgoProc.read(globals.cRender + 0xDCu, &off2, 1u);
 
 			const uint32_t finalAddr = (0x210u * 2u) + off2 - 0x44u;
-			csgoProc.read<float>(globals.cRender + 0x9Cu,
+			csgoProc.read<float>(finalAddr,
 				viewMatrix,
 				16);
 		}

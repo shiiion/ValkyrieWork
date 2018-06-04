@@ -243,11 +243,11 @@ int WINAPI WinMain(HINSTANCE hInst, HINSTANCE hPrevInstance, LPSTR lpCmdLine, in
 {
 	valkyrie::openConsole();
 	//don't do if csgo exists
-	if (ProcessMgr32::checkProcessExists("csgo.exe", true))
-	{
-		PRINT_LOG("CSGO is running");
-		return -1;
-	}
+	//if (ProcessMgr32::checkProcessExists("csgo.exe", true))
+	//{
+	//	PRINT_LOG("CSGO is running");
+	//	return -1;
+	//}
 
 	globals.screenWidth = GetSystemMetrics(SM_CXSCREEN);
 	globals.screenHeight = GetSystemMetrics(SM_CYSCREEN);

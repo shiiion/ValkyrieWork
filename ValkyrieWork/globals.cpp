@@ -30,7 +30,8 @@ namespace valkyrie
 		//now THIs is munted
 		{
 			const uint32_t inputFieldOffsets = inputSystemOffsetSigs.getSigAddress();
-			uint32_t off1, off2, off3, inputFieldOffset;
+			uint32_t off1, off2, off3;
+			uint8_t inputFieldOffset;
 			csgoProc.read(inputFieldOffsets + 0x03, &off1, 1);
 			csgoProc.read(inputFieldOffsets + 0x09, &off2, 1);
 			csgoProc.read(inputFieldOffsets + 0x0F, &off3, 1);
@@ -78,6 +79,7 @@ namespace valkyrie
 			return false;
 		}
 
+		auto const& baseCombatCharacterTable = netvarReader.getTable("DT_BaseCombatCharacter");
 		auto const& baseEntityTable = netvarReader.getTable("DT_BaseEntity");
 		auto const& basePlayerTable = netvarReader.getTable("DT_BasePlayer");
 		auto const& csPlayerTable = netvarReader.getTable("DT_CSPlayer");
@@ -91,7 +93,7 @@ namespace valkyrie
 		globals.entOffs.team = baseEntityTable.getPropOffset("m_iTeamNum");
 
 		globals.entOffs.health = basePlayerTable.getPropOffset("m_iHealth");
-		globals.entOffs.deadFlag = basePlayerTable.getPropOffset("m_lifestate");
+		globals.entOffs.deadFlag = basePlayerTable.getPropOffset("m_lifeState");
 		globals.entOffs.fFlags = basePlayerTable.getPropOffset("m_fFlags");
 		globals.entOffs.lastPlaceName = basePlayerTable.getPropOffset("m_szLastPlaceName");
 
@@ -107,6 +109,8 @@ namespace valkyrie
 			localTable.getPropOffset("m_viewPunchAngle");
 
 		globals.entOffs.pos = cslpExclusiveTable.getPropOffset("m_vecOrigin");
+
+		globals.entOffs.hWeapon = baseCombatCharacterTable.getPropOffset("m_hActiveWeapon");
 
 		globals.entOffs.weaponID = econEntityTable.getPropOffset("m_AttributeManager") +
 			attributeContainerTable.getPropOffset("m_Item") +

@@ -83,7 +83,6 @@ namespace menu
 			PlayerNameESP,
 			PlayerDistanceESP,
 			PlayerWeaponESP,
-			PlayerGlowESP,
 
 			LegitBotEnabled,
 			LegitAimKeySetting,
@@ -102,7 +101,8 @@ namespace menu
 
 			BunnyHopEnabled,
 			ChatSpam,
-			Hitmarkers;
+			Hitmarkers,
+			PlayerGlowESP;
 
 	};
 

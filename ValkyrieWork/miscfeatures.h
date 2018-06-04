@@ -64,6 +64,18 @@ namespace valkyrie
 		~BunnyhopFeature() {}
 	};
 
+	class GlowEsp : public Feature
+	{
+	private:
+		static string featureName;
+		static constexpr float newSensorTime = 50000000.f;
+		static constexpr uint8_t settingEnabled = 1ui8;
+	public:
+		GlowEsp(FeatureSet* fs) : Feature(fs) {}
+		auto execFeature() const -> void;
+		auto getFeatureName() const -> string const& { return featureName; }
+	};
+
 	class MiscFeatureSet : public FeatureSet
 	{
 	private:
@@ -74,6 +86,7 @@ namespace valkyrie
 			features["Chat Spam"] = new SpamChatFeature(this);
 			features["Hitmarkers"] = new HitMarkerFeature(this);
 			features["Bunnyhop"] = new BunnyhopFeature(this);
+			features["Glow"] = new GlowEsp(this);
 			//default enabled, should not be disabled
 			setEnabled(true);
 		}

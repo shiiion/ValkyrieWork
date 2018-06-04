@@ -56,7 +56,7 @@ namespace renderer
 		//t3: text color
 		vector<TextLine> lines;
 
-		void renderLines(vec2 const& startLoc)
+		void operator()(vec2 const& startLoc)
 		{
 			auto textStackHeight = 0.f;
 			constexpr auto textStackDistance = 12.f;
@@ -91,6 +91,25 @@ namespace renderer
 		pRenderer->DrawLine(start.x, start.y, end.x, end.y, static_cast<DWORD>(color.argb), thickness);
 	}
 
+	//static auto drawOutlinedLine(vec2 const& start, vec2 const& end, const color inner, const color outer, const float thickness) -> void
+	//{
+	//	const auto drawBox = [](vec2 const& mins, vec2 const& maxes, const color c) -> void
+	//	{
+	//		const float w = maxes.x - mins.x;
+	//		const float h = maxes.y - mins.y;
+	//
+	//		const vec2 v2 = vec2(mins.x + w, mins.y);
+	//		const vec2 v4 = vec2(mins.x, mins.y + h);
+	//
+	//		drawLine(mins, v2, c, 1);
+	//		drawLine(v2, maxes, c, 1);
+	//		drawLine(maxes, v4, c, 1);
+	//		drawLine(v4, mins, c, 1);
+	//	};
+	//	pRenderer->DrawLine(start.x, start.y, end.x, end.y, static_cast<DWORD>(inner.argb), thickness);
+	//	drawBox(start - vec2(thickness - 1, thickness), end + vec2(thickness + 1, thickness), outer);
+	//}
+
 	static constexpr auto boundsCheck(vec2 const& vec) -> bool
 	{
 		const uint32_t x = static_cast<uint32_t>(vec.x);
@@ -101,7 +120,7 @@ namespace renderer
 
 	static auto drawBox2d(vec2 const& mins, vec2 const& maxes, const color outer, const color inner) -> void
 	{
-		const auto drawBoxInternal = [](vec2 const& mins, vec2 const& maxes, const color c, const float thickness) -> void
+		const auto drawBoxInternal = [](vec2 const& mins, vec2 const& maxes, const color c, const float thickness, const bool hExtend) -> void
 		{
 			const float w = maxes.x - mins.x;
 			const float h = maxes.y - mins.y;
@@ -114,26 +133,28 @@ namespace renderer
 			const bool boundv3 = boundsCheck(maxes);
 			const bool boundv4 = boundsCheck(v4);
 
-			if (boundv1 && boundv2)
+			float extension = (hExtend ? 1.f : 0.f);
+
+			if (boundv1 || boundv2)
 			{
-				drawLine(mins, v2, c, thickness);
+				drawLine(mins + vec2(-extension, 0), v2 + vec2(extension, 0), c, thickness);
 			}
-			if (boundv2 && boundv3)
+			if (boundv2 || boundv3)
 			{
 				drawLine(v2, maxes, c, thickness);
 			}
-			if (boundv3 && boundv4)
+			if (boundv3 || boundv4)
 			{
-				drawLine(maxes, v4, c, thickness);
+				drawLine(maxes + vec2(extension, 0), v4 + vec2(-extension, 0), c, thickness);
 			}
-			if (boundv4 && boundv1)
+			if (boundv4 || boundv1)
 			{
 				drawLine(v4, mins, c, thickness);
 			}
 		};
 
-		drawBoxInternal(mins - vec2(1, 0), maxes + vec2(1, 0), outer, 3.f);
-		drawBoxInternal(mins, maxes, inner, 1.f);
+		drawBoxInternal(mins, maxes, outer, 3.f, true);
+		drawBoxInternal(mins, maxes, inner, 1.f, false);
 	}
 
 	static auto drawBox3d(std::array<vec2, 8> const& vertices, const color outer, const color inner) -> void
@@ -147,31 +168,31 @@ namespace renderer
 				boundsArr[a] = boundsCheck(v[a]);
 			}
 
-			if (boundsArr[0] && boundsArr[1])
+			if (boundsArr[0] || boundsArr[1])
 				drawLine(v[0], v[1], c, thickness);
-			if (boundsArr[1] && boundsArr[2])
+			if (boundsArr[1] || boundsArr[2])
 				drawLine(v[1], v[2], c, thickness);
-			if (boundsArr[2] && boundsArr[3])
+			if (boundsArr[2] || boundsArr[3])
 				drawLine(v[2], v[3], c, thickness);
-			if (boundsArr[3] && boundsArr[0])
+			if (boundsArr[3] || boundsArr[0])
 				drawLine(v[3], v[0], c, thickness);
 
-			if (boundsArr[0] && boundsArr[4])
+			if (boundsArr[0] || boundsArr[4])
 				drawLine(v[0], v[4], c, thickness);
-			if (boundsArr[1] && boundsArr[5])
+			if (boundsArr[1] || boundsArr[5])
 				drawLine(v[1], v[5], c, thickness);
-			if (boundsArr[2] && boundsArr[6])
+			if (boundsArr[2] || boundsArr[6])
 				drawLine(v[2], v[6], c, thickness);
-			if (boundsArr[3] && boundsArr[7])
+			if (boundsArr[3] || boundsArr[7])
 				drawLine(v[3], v[7], c, thickness);
 
-			if (boundsArr[4] && boundsArr[5])
+			if (boundsArr[4] || boundsArr[5])
 				drawLine(v[4], v[5], c, thickness);
-			if (boundsArr[5] && boundsArr[6])
+			if (boundsArr[5] || boundsArr[6])
 				drawLine(v[5], v[6], c, thickness);
-			if (boundsArr[6] && boundsArr[7])
+			if (boundsArr[6] || boundsArr[7])
 				drawLine(v[6], v[7], c, thickness);
-			if (boundsArr[7] && boundsArr[4])
+			if (boundsArr[7] || boundsArr[4])
 				drawLine(v[7], v[4], c, thickness);
 		};
 
@@ -220,7 +241,6 @@ namespace renderer
 	{
 		const vec2 lineStart = boxBase + vec2(6, 0);
 		const vec2 lineEnd = boxBase + vec2(6, -size);
-
 		drawLine(lineStart, lineEnd, outer, 3.f);
 		drawLine(lineStart, lineEnd, inner, 1.f);
 	}
@@ -241,8 +261,8 @@ namespace renderer
 	{
 		//EDITME
 		ColorConfig const& ccfg = colorConfigs[0];
-		TextStack textInfo;
-		textInfo.lines.reserve(3u);
+		TextStack textStackRender;
+		textStackRender.lines.reserve(3u);
 
 		for (auto a = 0u; a < payload.numPlayers; a++)
 		{
@@ -280,25 +300,25 @@ namespace renderer
 			if (payload.drawName)
 			{
 				TextLine line = { player.name.data(), true, healthColor };
-				textInfo.lines.emplace_back(line);
-			}
-			if (payload.drawWeaponName)
-			{
-				TextLine line = { player.weaponName.data(), false, healthColor };
-				textInfo.lines.emplace_back(line);
+				textStackRender.lines.emplace_back(line);
 			}
 			if (payload.drawDistance)
 			{
 				TextLine line = { distString.data(), false, healthColor };
-				textInfo.lines.emplace_back(line);
+				textStackRender.lines.emplace_back(line);
+			}
+			if (payload.drawWeaponName)
+			{
+				TextLine line = { player.weaponName.data(), false, healthColor };
+				textStackRender.lines.emplace_back(line);
 			}
 
 			//
 			{
 				const float xLoc = player.bbox[0].x + (player.bbox[1].x - player.bbox[0].x) / 2.f;
-				const float yLoc = player.bbox[1].y;
-				textInfo.renderLines(vec2(xLoc, yLoc));
-				textInfo.lines.clear();
+				const float yLoc = player.bbox[1].y + 6;
+				textStackRender(vec2(xLoc, yLoc));
+				textStackRender.lines.clear();
 			}
 		}
 	}

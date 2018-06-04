@@ -18,10 +18,7 @@ namespace valkyrie
 	{
 		for (auto const& featureSet : sets)
 		{
-			if (featureSet->enabled())
-			{
-				featureSet->execAllFeatures();
-			}
+			featureSet->execAllFeatures();
 		}
 	}
 

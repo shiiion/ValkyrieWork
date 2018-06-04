@@ -97,7 +97,6 @@ namespace menu
 			AddItem("Name ESP", Default, &PlayerNameESP, 2, "Draws player names");
 			AddItem("Distance ESP", Default, &PlayerDistanceESP, 2, "Draws distance to player in meters");
 			AddItem("Weapon ESP", Default, &PlayerWeaponESP, 2, "Draws Player weapons under them");
-			AddItem("Glow ESP", Default, &PlayerGlowESP, 2, "Draws a white glow outline around enemies ONLY");
 		}
 		if (TabIndex == 1)
 		{
@@ -123,6 +122,7 @@ namespace menu
 			AddItem("Bunnyhop", Default, &BunnyHopEnabled, 2, "Enables bunnyhop");
 			AddItem("Chat Spam", Default, &ChatSpam, 2, "Enables team callout chatspam");
 			AddItem("Hitmarkers", Default, &Hitmarkers, 2, "Enables Hitmarkers and Hitsounds");
+			AddItem("Glow", Default, &PlayerGlowESP, 2, "Draws a white glow outline around enemies ONLY");
 		}
 	}
 

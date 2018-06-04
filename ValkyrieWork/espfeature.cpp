@@ -17,7 +17,6 @@ namespace valkyrie
 	string NameEsp::featureName = "Name ESP";
 	string DistanceEsp::featureName = "Distance ESP";
 	string WeaponEsp::featureName = "Weapon ESP";
-	string GlowEsp::featureName = "Glow ESP";
 	string EspFeatureSet::setName = "ESP";
 
 	//dont worry too much about lateral diff, will rarely ever be a problem...
@@ -30,7 +29,7 @@ namespace valkyrie
 		const float realYaw = yaw + 180.f;
 
 		const vec3 diff = target - camera;
-		const float diffAngle = toDeg(diff.xyRotation());
+		const float diffAngle = toDeg(diff.xyRotation()) + 180.f;
 
 		//hit upper bound
 		if (realYaw + fov > 360.f)
@@ -76,8 +75,8 @@ namespace valkyrie
 		vec2& oMins, vec2& oMaxes, 
 		matrix_t viewMat)
 	{
-		oMins.x = oMins.y = std::numeric_limits<float>::min();
-		oMaxes.x = oMaxes.y = std::numeric_limits<float>::max();
+		oMins.x = oMins.y = std::numeric_limits<float>::max();
+		oMaxes.x = oMaxes.y = std::numeric_limits<float>::min();
 
 		std::array<vec3, 8> vertices3;
 		getVertices(maxes, mins, vertices3);
@@ -102,7 +101,9 @@ namespace valkyrie
 
 		for (uint32_t a = 0; a < 8; a++)
 		{
+			vertices3[a] = vertices3[a] - rotationPoint;
 			rotateZ(vertices3[a], yaw);
+			vertices3[a] = vertices3[a] + rotationPoint;
 			worldToScreen(vertices3[a], outVertices[a], viewMat);
 		}
 	}
@@ -122,15 +123,14 @@ namespace valkyrie
 		vec3 absMax = player->pos + player->bboxMax;
 
 		buffer.boundingBoxMode = setting();
-		if (setting() == setting2D)
+
+		getBoundingBox2D(absMin, absMax, playerPayload.bbox[0],
+			playerPayload.bbox[1], getViewMatrix());
+
+		if (setting() == setting3D)
 		{
 			getBoundingBox3D(absMin, absMax, player->pos, player->rot.y,
 				playerPayload.bbox3d, getViewMatrix());
-		}
-		else if (setting() == setting3D)
-		{
-			getBoundingBox2D(absMin, absMax, playerPayload.bbox[0],
-				playerPayload.bbox[1], getViewMatrix());
 		}
 	}
 
@@ -223,30 +223,6 @@ namespace valkyrie
 		}
 	}
 
-	//alternative, use hook
-	auto GlowEsp::execFeature() const -> void
-	{
-		if (setting() == settingEnabled)
-		{
-			if (player->health > 0 &&
-				player->health <= 100 &&
-				player->sensorTime != newSensorTime)
-			{
-				csgoProc.write(player->base + globals.entOffs.detectedBySensor, &newSensorTime, 1);
-			}
-		}
-		else
-		{
-			if (player->health > 0 &&
-				player->health <= 100 &&
-				player->sensorTime == newSensorTime)
-			{
-				constexpr float zero = 0;
-				csgoProc.write(player->base + globals.entOffs.detectedBySensor, &zero, 1);
-			}
-		}
-	}
-
 	auto EspFeatureSet::execAllFeatures() const -> void
 	{
 		ESPPayload& buffer = getPayloadBuffer();
@@ -267,14 +243,14 @@ namespace valkyrie
 				playerPayload.isTeammate = (player.team == local.team);
 
 				if (!player.validPlayer() ||
-					player.base != local.base ||
+					player.base == local.base ||
 					!shouldDraw ||
 					(!teamDrawEnabled && playerPayload.isTeammate))
 				{
 					continue;
 				}
 
-				shouldDraw = checkVisibleYaw(player.pos, local.pos, local.rot.y);
+				shouldDraw = checkVisibleYaw(player.pos, local.pos + local.viewOffset, local.rot.y);
 
 				if (shouldDraw)
 				{

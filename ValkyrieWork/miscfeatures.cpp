@@ -15,6 +15,7 @@ namespace valkyrie
 	string BunnyhopFeature::featureName = "Bunnyhop";
 	string SpamChatFeature::featureName = "Chat Spam";
 	string HitMarkerFeature::featureName = "Hitmarkers";
+	string GlowEsp::featureName = "Glow";
 	string MiscFeatureSet::setName = "Miscellaneous";
 
 	auto SpamChatFeature::execFeature() const -> void
@@ -104,6 +105,7 @@ namespace valkyrie
 						csgoProc.read<vec3>(vectorBase + (hitPosSize * a), 
 							&h.loc, 
 							1);
+						h.creationTime = startTime;
 						hitList.emplace_back(h);
 					}
 
@@ -125,7 +127,7 @@ namespace valkyrie
 
 				const pmatrix_t viewMatrix = getViewMatrix();
 
-				for (; it1 != hitList.end() && it2 != buffer.hitPoints.end(); it1 = it1++, it2++)
+				for (; it1 != hitList.end() && it2 != buffer.hitPoints.end();it1++, it2++)
 				{
 					worldToScreen(it1->loc, *it2, viewMatrix);
 				}
@@ -147,7 +149,6 @@ namespace valkyrie
 	auto BunnyhopFeature::execFeature() const -> void
 	{
 		CSPlayer const& local = playerList.getLocalPlayer();
-
 		if (setting() == 1u && 
 			isChatClosed() &&
 			checkKeyState(8, 1) &&
@@ -162,6 +163,42 @@ namespace valkyrie
 			else
 			{
 				csgoProc.write(globals.forceJump, &noJump, 1);
+			}
+		}
+	}
+
+	//alternative, use hook
+	auto GlowEsp::execFeature() const -> void
+	{
+		if (setting() == settingEnabled)
+		{
+			for (auto a = 0u; a < playerList.size(); a++)
+			{
+				CSPlayer const& player = playerList[a];
+
+				if (player.validTarget(playerList.getLocalPlayer()) &&
+					player.health > 0 &&
+					player.health <= 100 &&
+					player.sensorTime != newSensorTime)
+				{
+					csgoProc.write(player.base + globals.entOffs.detectedBySensor, &newSensorTime, 1);
+				}
+			}
+		}
+		else
+		{
+			for (auto a = 0u; a < playerList.size(); a++)
+			{
+				CSPlayer const& player = playerList[a];
+
+				if (player.validTarget(playerList.getLocalPlayer()) &&
+					player.health > 0 &&
+					player.health <= 100 &&
+					player.sensorTime == newSensorTime)
+				{
+					constexpr float zero = 0;
+					csgoProc.write(player.base + globals.entOffs.detectedBySensor, &zero, 1);
+				}
 			}
 		}
 	}

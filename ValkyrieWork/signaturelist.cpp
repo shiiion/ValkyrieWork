@@ -87,6 +87,13 @@ namespace valkyrie
 
 	auto initializeSignatures() -> void
 	{
+		const auto byteRead = [](const uint32_t address, const uint32_t offset) -> uint32_t
+		{
+			uint8_t val;
+			csgoProc.read(address + offset, &val, 1);
+			return static_cast<uint32_t>(val);
+		};
+
 		const auto doubleDerefRead = [](const uint32_t address, const uint32_t offset) -> uint32_t
 		{
 			uint32_t ret = badAddr;
@@ -150,6 +157,7 @@ namespace valkyrie
 		localPlayerSigs.signatures[0] = SigPair_t("8D 34 85 ?? ?? ?? ?? 89 15 ?? ?? ?? ?? 8B 41 08 8B 48", 0x03);
 
 		localPlayerOffsetSigs.modName = client;
+		localPlayerOffsetSigs.readFunction = byteRead;
 		localPlayerOffsetSigs.signatures[0] = SigPair_t("8D 34 85 ?? ?? ?? ?? 89 15 ?? ?? ?? ?? 8B 41 08 8B 48", 0x12);
 
 		cRenderSigs.modName = engine;

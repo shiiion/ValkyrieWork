@@ -2,20 +2,22 @@
 #include "memory.h"
 #include "globals.h"
 
+#include "valkAPI.h"
+
 namespace valkyrie
 {
 	PlayerList playerList;
 
 	static auto getHitboxSetBase(const uint32_t entBase) -> uint32_t
 	{
-		uint32_t modelHeader, hitboxSetBase;
+		uint32_t modelHeader, hitboxSetOffsetVal;
 		{
 			uint32_t temp;
 			csgoProc.read(entBase + globals.entOffs.modelHeader, &temp, 1);
 			csgoProc.read(temp, &modelHeader, 1);
 		}
-		csgoProc.read(modelHeader, &hitboxSetBase, 1);
-		return hitboxSetBase;
+		csgoProc.read(modelHeader + hitboxSetOffset, &hitboxSetOffsetVal, 1);
+		return modelHeader + hitboxSetOffsetVal;
 	}
 
 	template<typename EntityType>
@@ -74,6 +76,8 @@ namespace valkyrie
 		csgoProc.read(base + globals.entOffs.view, &viewOffset, 1);
 		csgoProc.read(base + globals.entOffs.velocity, &vel, 1);
 		csgoProc.read(base + globals.entOffs.rotation, &rot, 1);
+		normalizeAngles(rot);
+		clampAngles(rot);
 		csgoProc.read(base + globals.entOffs.deadFlag, &isDead, 1);
 		csgoProc.read(base + globals.entOffs.team, &team, 1);
 		csgoProc.read(base + globals.entOffs.health, &health, 1);
@@ -89,6 +93,7 @@ namespace valkyrie
 			BaseCombatWeapon weapon;
 			csgoProc.read(base + globals.entOffs.hWeapon, &hWeapon, 1);
 			readEntityFromHandle(globals.entityList, hWeapon, weapon);
+			weaponID = weapon.weaponID;
 		}
 
 		const uint32_t hitboxSetBase = getHitboxSetBase(base);
@@ -108,13 +113,14 @@ namespace valkyrie
 
 		for (uint32_t a = 0; a < expectedHitboxCount; a++)
 		{
+			matrix_t bone;
 			int32_t boneID;
 			csgoProc.read(hitboxSetList + (0x44 * a), &boneID, 1);
 
 			const uint32_t hitboxMatrix = bonematrixBase + (matrixSize * boneID);
-			csgoProc.read(hitboxMatrix + 0x0C, &bones[0], 1);
-			csgoProc.read(hitboxMatrix + 0x1C, &bones[1], 1);
-			csgoProc.read(hitboxMatrix + 0x2C, &bones[2], 1);
+			csgoProc.read(hitboxMatrix, bone, 16);
+
+			bones[a] = vec3(bone[3], bone[7], bone[11]);
 		}
 	}
 
@@ -129,6 +135,7 @@ namespace valkyrie
 	auto PlayerList::readLocalPlayer() -> void
 	{
 		csgoProc.read(globals.localPlayer, &localPlayer.base, 1);
+		localPlayer.readData();
 	}
 
 	auto PlayerList::readMaxPlayers() -> void
