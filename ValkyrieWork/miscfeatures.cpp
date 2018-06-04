@@ -12,6 +12,11 @@
 
 namespace valkyrie
 {
+	string BunnyhopFeature::featureName = "Bunnyhop";
+	string SpamChatFeature::featureName = "Chat Spam";
+	string HitMarkerFeature::featureName = "Hitmarkers";
+	string MiscFeatureSet::setName = "Miscellaneous";
+
 	auto SpamChatFeature::execFeature() const -> void
 	{
 		const uint32_t tickTime = static_cast<uint32_t>(GetTickCount());

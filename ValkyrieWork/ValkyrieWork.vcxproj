@@ -129,6 +129,7 @@
     <ClCompile Include="espfeature.cpp" />
     <ClCompile Include="esprendering.cpp" />
     <ClCompile Include="featurelist.cpp" />
+    <ClCompile Include="featuremenuinterface.cpp" />
     <ClCompile Include="globals.cpp" />
     <ClCompile Include="main.cpp" />
     <ClCompile Include="memory.cpp" />
@@ -149,6 +150,7 @@
     <ClInclude Include="espfeatures.h" />
     <ClInclude Include="esprendering.h" />
     <ClInclude Include="feature.h" />
+    <ClInclude Include="featuremenuinterface.h" />
     <ClInclude Include="globals.h" />
     <ClInclude Include="memory.h" />
     <ClInclude Include="Menu.h" />

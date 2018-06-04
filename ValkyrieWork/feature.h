@@ -1,18 +1,64 @@
 #pragma once
 
 #include "res.h"
+#include <functional>
 
 namespace valkyrie
 {
 	class FeatureSet;
-	typedef map<string, uint8_t> FeatureConfig_t;
 
 	//use fSetting for FOV geno
 	struct Setting
 	{
-		float fSetting;
-		uint32_t iSetting;
+		union setting_value
+		{
+			setting_value(float fs) : fSetting(fs) {};
+			setting_value(int32_t is) : iSetting(is) {};
+			setting_value() : iSetting(0) {};
+
+			float fSetting;
+			int32_t iSetting;
+		}setting;
+
+		using SettingLookup = function<setting_value(int32_t)>;
+		SettingLookup lookupFn = nullptr;
+
+		Setting(const int32_t sv = 0, SettingLookup lookup = nullptr)
+		{
+			setting.iSetting = sv;
+			lookupFn = lookup;
+		}
+
+		Setting(const float sv, SettingLookup lookup = nullptr)
+		{
+			setting.fSetting = sv;
+			lookupFn = lookup;
+		}
+
+		constexpr auto i() const -> int32_t
+		{
+			return setting.iSetting;
+		}
+		constexpr auto f() const -> float
+		{
+			return setting.fSetting;
+		}
+		
+		auto set(int32_t menuLookup, setting_value onFail) -> void
+		{
+			if (lookupFn != nullptr)
+			{
+				setting = lookupFn(menuLookup);
+			}
+			else
+			{
+				setting = onFail;
+			}
+		}
+
 	};
+
+	typedef map<string, Setting> FeatureConfig_t;
 
 	class Feature
 	{
@@ -71,36 +117,52 @@ namespace valkyrie
 		virtual auto execAllFeatures() const -> void;
 		virtual auto getFeatureSetName() const -> string const& = 0;
 
-		template<typename T>
-		auto getFeatureByName(string const& name) -> T*;
-		template<typename T>
-		auto getFeatureByName(string const& name) const -> T const*;
+		auto getFeature(string const& name) -> Feature*;
+		auto getFeature(string const& name) const -> Feature const*;
 
-		auto getSettingByName(string const& name) -> Setting*;
-		auto getSettingByName(string const& name) const -> Setting const*;
+		auto getSetting(string const& name) -> Setting*;
+		auto getSetting(string const& name) const -> Setting const*;
+
+		~FeatureSet()
+		{
+			for (auto& kv : features)
+			{
+				if (kv.second)
+				{
+					delete kv.second;
+				}
+			}
+		}
 	};
 
 	class FeatureList
 	{
 	private:
-		vector<FeatureSet> sets;
+		vector<FeatureSet*> sets;
 	public:
 		auto initFeatures() -> void;
 		auto execAllFeatures() const -> void;
 
-		auto readFeatureConfig(FeatureConfig_t const& config) -> void;
+		auto getFeature(string const& name) -> Feature*;
+		auto getFeature(string const& name) const -> Feature const*;
 
-		template<typename T>
-		auto getFeatureByName(string const& name) -> T*;
+		auto getSetting(string const& name) const -> Setting const*;
+		auto getSetting(string const& name) -> Setting*;
 
-		template<typename T>
-		auto getFeatureByName(string const& name) const -> T const*;
 
-		template<typename T>
-		auto getFeatureSetByName(string const& name) const-> T const*;
+		auto getFeatureSet(string const& name) const-> FeatureSet const*;
+		auto getFeatureSet(string const& name) -> FeatureSet*;
 
-		template<typename T>
-		auto getFeatureSetByName(string const& name) -> T*;
+		~FeatureList()
+		{
+			for (FeatureSet* f : sets)
+			{
+				if (f)
+				{
+					delete f;
+				}
+			}
+		}
 	};
 
 	extern FeatureList featureList;

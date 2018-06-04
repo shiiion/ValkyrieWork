@@ -10,43 +10,59 @@
 
 namespace valkyrie
 {
-	//menu options for both aimbots
-	static constexpr uint32_t aimStrengthOptions = 5;
-	static constexpr float aimStrengths[5] = { 0, 0.01f, 0.015f, 0.02f, 0.025f };
-	static constexpr uint32_t aimFovOptions = 10;
-	static constexpr float aimFovs[10] = { 0, 0.0033f, 0.0077f, 0.011f, 0.022f, 0.055f, 0.11f, 0.33f, 0.55f, 0.99f };
+	string RageBot::featureName = "Ragebot";
+	string LegitBot::featureName = "Legitbot";
+	string AimbotFeatureSet::setName = "Aimbot";
+
+	static auto checkKeyByMenuIndex(int32_t menuIdx) -> bool
+	{
+		switch (menuIdx)
+		{
+		case 0:
+			return checkKeyState(0x0D, 3);
+		case 1:
+			return checkKeyState(0x0D, 4);
+		case 2:
+			return checkKeyState(0x0D, 5);
+		case 3:
+			return checkKeyState(0x0D, 6);
+		case 4:
+			return checkKeyState(0x0D, 7);
+		default:
+			return false;
+		}
+	}
+
 
 	//shared helper functions for both aimbots
-	static auto chooseEnemy(float& distanceToCenter, bool friendlyFire) -> uint32_t
+	static auto chooseEnemy(float& distanceToCenter, const bool friendlyFire) -> int32_t
 	{
-		CSPlayer& localPlayer = playerList.getLocalPlayer();
-		uint32_t bestIndex;
+		CSPlayer const& localPlayer = playerList.getLocalPlayer();
+		int32_t bestIndex = -1;
 		const vec2 screenCenter = vec2(globals.screenWidth / 2.f, globals.screenHeight / 2.f);
 		float minDist = std::numeric_limits<float>::max();
 		float dist = 0;
+		vec2 playerScreenPosition;
+
 		for (auto i = 0u; i < playerList.size(); i++)
 		{
-			vec2 playerScreenPosition;
 			const CSPlayer& currentPlayer = playerList[i];
 			//if failed to read adequate number of hitboxes
-			if (!currentPlayer.hitboxReadSuccess)
-			{
-				continue;
-			}
-			//if trying to read your own shit, obviously not gonna aim at urself LOL!!! :D XD
-			if (currentPlayer.base == localPlayer.base)
-			{
-				continue;
-			}
+			//if trying to read your own shit, obviously not gonna aim at urself LOL!!! :D XD shut up geno
 			//skip teammates that cannot be aimed at if friendly fire is off
-			if (!friendlyFire && !currentPlayer.validTarget(localPlayer))
+			if (!currentPlayer.hitboxReadSuccess ||
+				!currentPlayer.validPlayer() ||
+				currentPlayer.base == localPlayer.base ||
+				(!friendlyFire && (currentPlayer.team == localPlayer.team)))
 			{
 				continue;
 			}
 			//what the fuck is this?
 			//checks if w2s fails, sets playerscreenposition
 			//bone 5 is middle torso. this may be changed in the future.
-			if (!currentPlayer.validPlayer() || !worldToScreen(currentPlayer.bones[5], playerScreenPosition, getViewMatrix()))
+			//uh dont do this? w2s returns false if off-screen...
+			//i'll leave it here FN
+			if (!worldToScreen(currentPlayer.bones[5], playerScreenPosition, getViewMatrix()))
 			{
 				//did not succeed
 				continue;
@@ -57,7 +73,7 @@ namespace valkyrie
 			if (distToCenter < minDist)
 			{
 				minDist = distToCenter;
-				bestIndex = i;
+				bestIndex = static_cast<int32_t>(i);
 			}
 			dist = minDist;
 		}
@@ -66,9 +82,11 @@ namespace valkyrie
 		return bestIndex;
 	}
 
-	static auto aimAtEnemy(const vec3& enemyPos, const vec3& localPos, float enemyDistance, bool rcsEnabled, float FOV, float aimStrength) -> void
+	//i dont want to touch this...
+	static auto aimAtEnemy(const vec3& enemyPos, const vec3& localPos, const float enemyDistance, 
+		const bool rcsEnabled, const float FOV, const float aimStrength) -> void
 	{
-		vec2 screenCenter = vec2(globals.screenWidth / 2.f, globals.screenHeight / 2.f);
+		const vec2 screenCenter = vec2(globals.screenWidth / 2.f, globals.screenHeight / 2.f);
 		const float normalizedDist = enemyDistance / sqrt(screenCenter.dot(screenCenter));
 		if (normalizedDist > FOV)
 		{
@@ -82,17 +100,19 @@ namespace valkyrie
 		vec3 viewPunchCalc;
 
 		//randomize , percent subject to change
-		const float randPercent = 1.f / 8.f;
+		//what??
+		//can we not
+		constexpr float randPercent = 1.f / 8.f;
 
 		const float lowerAimpunchX = -abs(playerList.getLocalPlayer().aimPunch.x * randPercent);
 		const float upperAimpunchX = abs(playerList.getLocalPlayer().aimPunch.x * randPercent);
 		const float lowerAimpunchY = -abs(playerList.getLocalPlayer().aimPunch.y * randPercent);
 		const float upperAimpunchY = abs(playerList.getLocalPlayer().aimPunch.y * randPercent);
 
-		const vec3 randomRecoil = vec3(random<float>(lowerAimpunchX, upperAimpunchX), random<float>(lowerAimpunchY, upperAimpunchY), 0);
+		//const vec3 randomRecoil = vec3(random<float>(lowerAimpunchX, upperAimpunchX), random<float>(lowerAimpunchY, upperAimpunchY), 0);
 
 		//compensate for random rcs
-		viewPunchCalc = viewPunchCalc + (((playerList.getLocalPlayer().aimPunch * 2.f) + randomRecoil) + playerList.getLocalPlayer().viewPunch);
+		viewPunchCalc = viewPunchCalc + (((playerList.getLocalPlayer().aimPunch * 2.f)/* + randomRecoil*/) + playerList.getLocalPlayer().viewPunch);
 
 		vec3 angles;
 		vectorAngles(enemyPos - localPos, angles);
@@ -124,55 +144,31 @@ namespace valkyrie
 		csgoProc.write<vec3>(globals.viewAngles + globals.otherOffs.viewAngle, &viewAngles, 1u);
 	}
 
-
-	//legitbot implementation ****************************************************************************|
-	constexpr auto LegitBot::setAimStrength(uint32_t menuIndex) -> void
+	auto AimbotFeature::execFeature() const -> void
 	{
-		if (menuIndex >= aimStrengthOptions)
-		{
-			aimStrength = aimStrengths[0];
-		}
-		else
-		{
-			aimStrength = aimStrengths[menuIndex];
-		}
-	}
+		const CSPlayer& localPlayer = playerList.getLocalPlayer();
 
-	constexpr auto LegitBot::setAimFov(uint32_t menuIndex) -> void
-	{
-		if (menuIndex >= aimFovOptions)
-		{
-			aimFov = aimFovs[0];
-		}
-		else
-		{
-			aimFov = aimFovs[menuIndex];
-		}
-	}
+		if (localPlayer.isDead) return;
 
-	auto LegitBot::execFeature() const -> void
-	{
-		CSPlayer& localPlayer = playerList.getLocalPlayer();
-		
 		float bestEnemyDistance;
-		const uint32_t targetIndex = chooseEnemy(bestEnemyDistance, this->friendlyFire);
-
-		const HitboxID boneID = chooseBone(targetIndex);
+		const int32_t targetIndex = chooseEnemy(bestEnemyDistance, friendlyFireEnabled());
 
 		//double check the target index values aren't bs
-		if (targetIndex < 0 || unsigned(targetIndex) >= playerList.size())
+		if (targetIndex == -1 || targetIndex >= static_cast<int32_t>(playerList.size()))
 		{
 			return;
 		}
+
+		const HitboxID boneID = chooseBone(targetIndex);
+
 		const CSPlayer& targetPlayer = playerList[targetIndex];
 		const vec3 targetBone = targetPlayer.bones[boneID];
-		//localplayer needs to be alive to take shots haha
-		if (!localPlayer.isDead)
-		{
-			aimAtEnemy(targetBone, localPlayer.pos + localPlayer.viewOffset, bestEnemyDistance, this->rcsEnabled, this->aimFov, this->aimStrength);
-		}
+
+		aimAtEnemy(targetBone, localPlayer.pos + localPlayer.viewOffset, 
+			bestEnemyDistance, rcsEnabled(), getFov(), getAimStrength());
 	}
 
+	//legitbot implementation ****************************************************************************|
 	auto LegitBot::chooseBone(const uint32_t bestTarget) const -> HitboxID
 	{
 		HitboxID bestBone = midTorso;
@@ -180,20 +176,21 @@ namespace valkyrie
 		float minDist = std::numeric_limits<float>::max();
 		if (bestTarget >= 0)
 		{
-			const vector<HitboxID> hitboxes = { head,neck,rightShoulder,leftShoulder,upperTorso,
+			//performance bump from using vectors
+			const std::array<HitboxID, 10>  hitboxes = { head,neck,rightShoulder,leftShoulder,upperTorso,
 				midTorso,lowTorso,pelvis,rightHip,leftHip };
 
-			for (auto aimpoint : hitboxes)
+			for (auto const aimpoint : hitboxes)
 			{
-				vec2 playerScreenPosition;
+				vec2 boneScreenPos;
 				//checks if w2s fails on bone or that this player is still a valid target
 				//sets playerscreenposition to current bone if succeed
-				if (!playerList[bestTarget].validPlayer() || !worldToScreen(playerList[bestTarget].bones[aimpoint], playerScreenPosition, getViewMatrix()))
+				if (!playerList[bestTarget].validPlayer() || !worldToScreen(playerList[bestTarget].bones[aimpoint], boneScreenPos, getViewMatrix()))
 				{
 					//failed
 					continue;
 				}
-				const float distToCenter = playerScreenPosition.distance(screenCenter);
+				const float distToCenter = boneScreenPos.distance(screenCenter);
 				if (distToCenter < minDist)
 				{
 					minDist = distToCenter;
@@ -208,46 +205,33 @@ namespace valkyrie
 
 	
 	//ragebot implementation *****************************************************************************|
-	constexpr auto RageBot::setAimFov(uint32_t menuIndex) -> void
+
+	//LOL
+	auto RageBot::chooseBone(const uint32_t bestTarget) const -> HitboxID
 	{
-		if (menuIndex >= aimFovOptions)
-		{
-			aimFov = aimFovs[0];
-		}
-		else
-		{
-			aimFov = aimFovs[menuIndex];
-		}
-	}
-
-	auto RageBot::execFeature() const -> void
-	{
-		CSPlayer& localPlayer = playerList.getLocalPlayer();
-
-		float bestEnemyDistance;
-		const uint32_t targetIndex = chooseEnemy(bestEnemyDistance, this->friendlyFire);
-
-		const HitboxID boneID = chooseBone(this->bodyShots);
-
-		//double check the target index values aren't bs
-		if (targetIndex < 0 || unsigned(targetIndex) >= playerList.size())
-		{
-			return;
-		}
-		const CSPlayer& targetPlayer = playerList[targetIndex];
-		const vec3 targetBone = targetPlayer.bones[boneID];
-		//localplayer needs to be alive to take shots haha
-		if (!localPlayer.isDead)
-		{
-			aimAtEnemy(targetBone, localPlayer.pos + localPlayer.viewOffset, bestEnemyDistance, this->rcsEnabled, this->aimFov, this->aimStrength);
-		}
-	}
-	auto RageBot::chooseBone(bool bodyShots) const -> HitboxID
-	{
-		return bodyShots ? midTorso : head;
+		return getContainerSet()->getSetting("Rage Bodyshots")->i() ? midTorso : head;
 	}
 
 	//ragebot implementation ended ***********************************************************************|
 	
-	
+	auto AimbotFeatureSet::execAllFeatures() const -> void
+	{
+		Feature const* f = nullptr;
+		//this will "technically" select legit over rage if both enabled
+		//ensure it is not...
+		if ((f = features.at("Legitbot"))->setting() == 1ui32)
+		{
+			if (checkKeyByMenuIndex(getSetting("Legit Aim Key")->i()))
+			{
+				f->execFeature();
+			}
+		}
+		else if ((f = features.at("Ragebot"))->setting() == 1ui32)
+		{
+			if (checkKeyByMenuIndex(getSetting("Rage Aim Key")->i()))
+			{
+				f->execFeature();
+			}
+		}
+	}
 }

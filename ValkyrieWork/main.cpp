@@ -10,6 +10,7 @@
 #include "feature.h"
 #include "RenderPayload.h"
 #include "esprendering.h"
+#include "featuremenuinterface.h"
 
 #include "Renderer.h"
 #include "Menu.h"
@@ -19,6 +20,7 @@
 //signal close between threads
 static std::atomic_bool memThreadState;
 static std::atomic_bool mainThreadState;
+static std::atomic_bool featuresLoaded = false;
 
 static std::mutex payloadMutex;
 
@@ -139,33 +141,36 @@ static auto pplifyMe() -> bool
 
 static auto renderFrame(DXObject<LPDIRECT3DDEVICE9> const& device) -> void
 {
-	ESPPayload payload;
-
-	device->Clear(0, nullptr, D3DCLEAR_TARGET, 0, 1.0f, 0);
-
-	if (SUCCEEDED(device->BeginScene()))
+	if (featuresLoaded.load())
 	{
-		renderer::pRenderer->Create(device.get());
-		renderer::pRenderer->Begin();
+		ESPPayload payload;
 
-		//menu::Menu.RenderFramework();
+		device->Clear(0, nullptr, D3DCLEAR_TARGET, 0, 1.0f, 0);
 
-		copyOutPayload(payload);
-
-		if (payload.shouldDraw)
+		if (SUCCEEDED(device->BeginScene()))
 		{
-			renderer::drawESP(payload);
-		}
-		if (payload.drawHitpoints)
-		{
-			renderer::drawHitmarkers(payload);
+			renderer::pRenderer->Create(device.get());
+			renderer::pRenderer->Begin();
+
+			menu::Menu.RenderFramework();
+
+			copyOutPayload(payload);
+
+			if (payload.shouldDraw)
+			{
+				renderer::drawESP(payload);
+			}
+			if (payload.drawHitpoints)
+			{
+				renderer::drawHitmarkers(payload);
+			}
+
+			renderer::pRenderer->End();
+			device->EndScene();
 		}
 
-		renderer::pRenderer->End();
-		device->EndScene();
+		device->Present(nullptr, nullptr, nullptr, nullptr);
 	}
-
-	device->Present(nullptr, nullptr, nullptr, nullptr);
 }
 
 static auto manageCSGOMemory() -> void
@@ -201,8 +206,13 @@ static auto manageCSGOMemory() -> void
 	featureList.initFeatures();
 	//featureList.readFeatureConfig(...);
 
+	featuresLoaded = true;
+
 	while (memThreadState.load() && csgoProc.isProcessRunning())
 	{
+		menu::Menu.MouseInput();
+		writeMenuToFeatureList();
+
 		if (signonStateInGame() && initializeDTOffsets())
 		{
 			playerList.readPlayers();
@@ -211,7 +221,7 @@ static auto manageCSGOMemory() -> void
 			{
 				updateViewMatrix();
 
-				featureList.execAllFeatures();
+				//featureList.execAllFeatures();
 
 				copyBufferToPayload();
 			}

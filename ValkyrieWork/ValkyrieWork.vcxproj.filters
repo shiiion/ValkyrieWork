@@ -55,6 +55,9 @@
     <ClCompile Include="Menu.cpp">
       <Filter>Source Files\Bad/Old Stuff %28renderer/menu%29</Filter>
     </ClCompile>
+    <ClCompile Include="featuremenuinterface.cpp">
+      <Filter>Source Files\Features</Filter>
+    </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="CD3DFont.h">
@@ -113,6 +116,9 @@
     </ClInclude>
     <ClInclude Include="Menu.h">
       <Filter>Source Files\Bad/Old Stuff %28renderer/menu%29</Filter>
+    </ClInclude>
+    <ClInclude Include="featuremenuinterface.h">
+      <Filter>Source Files\Features</Filter>
     </ClInclude>
   </ItemGroup>
   <ItemGroup>

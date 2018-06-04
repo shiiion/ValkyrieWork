@@ -9,8 +9,6 @@ namespace menu
 	{
 		using string = std::string;
 	public:
-		std::set<string> NetworkedFeatures;
-
 		DWORD ActiveText;
 
 		int NewR, NewG, NewB;
@@ -29,6 +27,7 @@ namespace menu
 		struct
 		{
 			string Text;
+			string ImplicitName;
 			string Desc;
 			string *Options;
 			int  *Variable;
@@ -41,6 +40,7 @@ namespace menu
 
 		void AddTab(string Text);
 		void AddItem(string Text, string *Options, int *Variable, int MaxVal, string Desc);
+		void AddItem(string Text, string ImplicitName, string *Options, int *Variable, int MaxVal, string Desc);
 
 		void RenderFramework();
 		void RenderMenu();

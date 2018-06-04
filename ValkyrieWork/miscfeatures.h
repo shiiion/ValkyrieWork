@@ -10,6 +10,7 @@ namespace valkyrie
 	class SpamChatFeature : public Feature
 	{
 	private:
+		static string featureName;
 		//last tick we sent a message for timing
 		mutable uint32_t lastTickMessage;
 		//last player we displayed
@@ -20,7 +21,7 @@ namespace valkyrie
 		SpamChatFeature(FeatureSet* fs) : Feature(fs) {}
 
 		auto execFeature() const -> void;
-		auto getFeatureName() const -> string const& { return "Chat Spam"; }
+		auto getFeatureName() const -> string const& { return featureName; }
 
 		~SpamChatFeature() {}
 	};
@@ -28,6 +29,7 @@ namespace valkyrie
 	class HitMarkerFeature : public Feature
 	{
 	private:
+		static string featureName;
 
 		struct Hit
 		{
@@ -45,23 +47,27 @@ namespace valkyrie
 		HitMarkerFeature(FeatureSet* fs) : Feature(fs) {}
 
 		auto execFeature() const -> void;
-		auto getFeatureName() const -> string const& { return "Hitmarkers"; }
+		auto getFeatureName() const -> string const& { return featureName; }
 
 		~HitMarkerFeature() {}
 	};
 
 	class BunnyhopFeature : public Feature
 	{
+	private:
+		static string featureName;
 	public:
 		BunnyhopFeature(FeatureSet* fs) : Feature(fs) {}
 		auto execFeature() const -> void;
-		auto getFeatureName() const -> string const& { return "Bunnyhop"; }
+		auto getFeatureName() const -> string const& { return featureName; }
 
 		~BunnyhopFeature() {}
 	};
 
 	class MiscFeatureSet : public FeatureSet
 	{
+	private:
+		static string setName;
 	public:
 		MiscFeatureSet()
 		{
@@ -72,6 +78,6 @@ namespace valkyrie
 			setEnabled(true);
 		}
 
-		auto getFeatureSetName() const -> string const& { return "Miscellaneous"; }
+		auto getFeatureSetName() const -> string const& { return setName; }
 	};
 }

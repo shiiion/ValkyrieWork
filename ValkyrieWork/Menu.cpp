@@ -88,7 +88,7 @@ namespace menu
 
 		if (TabIndex == 0)
 		{
-			AddItem("Enabled", Default, &ESPEnabled, 2, "Enables or disables ESP");
+			AddItem("Enabled", "ESP", Default, &ESPEnabled, 2, "Enables or disables ESP");
 			AddItem("Color Scheme", ESPSchemes, &ESPColorScheme, 2, "Choose color scheme for ESP");
 			AddItem("Team ESP", Default, &PlayerTeamESP, 2, "Applies all ESP settings to teammates");
 			AddItem("Box ESP", boxSettings, &PlayerBoxESP, 3, "Draws a box around players");
@@ -101,20 +101,20 @@ namespace menu
 		}
 		if (TabIndex == 1)
 		{
-			AddItem("Enabled", Default, &LegitBotEnabled, 2, "Enables or disables legit bot");
-			AddItem("Aim Key", AimKeys, &LegitAimKeySetting, 5, "Sets the key for aimbot");
-			AddItem("Friendly Fire", Default, &legitBotFriendlyFire, 2, "Enables or disables friendly fire");
-			AddItem("Strength", legitBotSpeeds, &LegitBotSpeed, 5, "Configure the strength of the legitbot");
-			AddItem("FOV", AimBotFOVSettings, &legitBotFOV, 10, "Configure FOV of legitbot target aquisition");
-			AddItem("RCS", Default, &legitBotRCS, 2, "Enable or disable additional recoil control system");
+			AddItem("Enabled", "Legitbot", Default, &LegitBotEnabled, 2, "Enables or disables legit bot");
+			AddItem("Aim Key", "Legit Aim Key", AimKeys, &LegitAimKeySetting, 5, "Sets the key for aimbot");
+			AddItem("Friendly Fire", "Legit Friendly Fire", Default, &legitBotFriendlyFire, 2, "Enables or disables friendly fire");
+			AddItem("Strength", "Aim Strength", legitBotSpeeds, &LegitBotSpeed, 5, "Configure the strength of the legitbot");
+			AddItem("FOV", "Legit FOV", AimBotFOVSettings, &legitBotFOV, 10, "Configure FOV of legitbot target aquisition");
+			AddItem("RCS", "Legit RCS", Default, &legitBotRCS, 2, "Enable or disable additional recoil control system");
 		}
 		if (TabIndex == 2)
 		{
-			AddItem("Enabled", Default, &RageBotEnabled, 2, "Enables or disables rage bot");
-			AddItem("Aim Key", AimKeys, &RageAimKeySetting, 5, "Sets the key for aimbot");
-			AddItem("Friendly Fire", Default, &RagebotFriendlyFire, 2, "Enables or disables friendly fire");
-			AddItem("FOV", AimBotFOVSettings, &RageBotFOV, 10, "Configure FOV of ragebot target aquisition");
-			AddItem("RCS", Default, &RageBotRCS, 2, "Enable or disable additional recoil control system");
+			AddItem("Enabled", "Ragebot", Default, &RageBotEnabled, 2, "Enables or disables rage bot");
+			AddItem("Aim Key", "Rage Aim Key", AimKeys, &RageAimKeySetting, 5, "Sets the key for aimbot");
+			AddItem("Friendly Fire", "Rage Friendly Fire", Default, &RagebotFriendlyFire, 2, "Enables or disables friendly fire");
+			AddItem("FOV", "Rage FOV", AimBotFOVSettings, &RageBotFOV, 10, "Configure FOV of ragebot target aquisition");
+			AddItem("RCS", "Rage RCS", Default, &RageBotRCS, 2, "Enable or disable additional recoil control system");
 			AddItem("Bodyshots", rageBotHitboxSettings, &RageBotHitbox, 2, "Choose hitbox for ragebot");
 		}
 
@@ -164,6 +164,7 @@ namespace menu
 	void cMenu::AddItem(string Text, string* Options, int* Variable, int MaxVal, string Desc)
 	{
 		Item[ItemMax].Text = std::move(Text);
+		Item[ItemMax].ImplicitName = Item[ItemMax].Text;
 		Item[ItemMax].Options = Options;
 		Item[ItemMax].Variable = Variable;
 		Item[ItemMax].MaxVal = MaxVal;
@@ -171,6 +172,16 @@ namespace menu
 		ItemMax++;
 	}
 
+	void cMenu::AddItem(string Text, string implicitName, string* Options, int* Variable, int MaxVal, string Desc)
+	{
+		Item[ItemMax].Text = std::move(Text);
+		Item[ItemMax].ImplicitName = std::move(implicitName);
+		Item[ItemMax].Options = Options;
+		Item[ItemMax].Variable = Variable;
+		Item[ItemMax].MaxVal = MaxVal;
+		Item[ItemMax].Desc = std::move(Desc);
+		ItemMax++;
+	}
 	void cMenu::RenderMenu()
 	{
 		TabHeight = 24;

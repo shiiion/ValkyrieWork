@@ -1,4 +1,7 @@
 #include "feature.h"
+#include "aimbotfeatures.h"
+#include "espfeatures.h"
+#include "miscfeatures.h"
 
 namespace valkyrie
 {
@@ -6,71 +9,74 @@ namespace valkyrie
 
 	auto FeatureList::initFeatures() -> void
 	{
-		//initialize stuff here
+		sets.emplace_back(new EspFeatureSet());
+		sets.emplace_back(new AimbotFeatureSet());
+		sets.emplace_back(new MiscFeatureSet());
 	}
 
 	auto FeatureList::execAllFeatures() const -> void
 	{
 		for (auto const& featureSet : sets)
 		{
-			if (featureSet.enabled())
+			if (featureSet->enabled())
 			{
-				featureSet.execAllFeatures();
+				featureSet->execAllFeatures();
 			}
 		}
 	}
 
-	auto FeatureList::readFeatureConfig(FeatureConfig_t const& config) -> void
+	auto FeatureList::getFeature(string const& name) -> Feature*
 	{
-		for (auto const& kv : config)
-		{
-			Feature* f = getFeatureByName<Feature>(kv.first);
-			if (f != nullptr)
-			{
-				f->changeSetting(kv.second);
-			}
-
-		}
+		return const_cast<Feature*>(const_cast<const FeatureList*>(this)->getFeature(name));
 	}
 
-	template<typename T>
-	auto FeatureList::getFeatureByName(string const& name) -> T*
-	{
-		return const_cast<T*>(const_cast<const FeatureList*>(this)->getFeatureByName<T>(name));
-	}
-
-	template<typename T>
-	auto FeatureList::getFeatureByName(string const& name) const -> T const*
+	auto FeatureList::getFeature(string const& name) const -> Feature const*
 	{
 		for (auto const& featureSet : sets)
 		{
-			T const* f = featureSet.getFeatureByName<T>(name);
+			Feature const* f = featureSet->getFeature(name);
 			if (f != nullptr)
 			{
 				return f;
 			}
 		}
-		return reinterpret_cast<T const*>(nullptr);
+		return static_cast<Feature const*>(nullptr);
 	}
 
-	template<typename T>
-	auto FeatureList::getFeatureSetByName(string const& name) const -> T const*
+	auto FeatureList::getSetting(string const& name) const -> Setting const*
 	{
 		for (auto const& featureSet : sets)
 		{
-			if (featureSet.getFeatureSetName() == name)
+			Setting const* s = featureSet->getSetting(name);
+			if (s != nullptr)
 			{
-				return dynamic_cast<T const*>(&featureSet);
+				return s;
+			}
+		}
+		return nullptr;
+	}
+
+	auto FeatureList::getSetting(string const& name) -> Setting*
+	{
+		return const_cast<Setting*>(const_cast<const FeatureList*>(this)->getSetting(name));
+	}
+
+	auto FeatureList::getFeatureSet(string const& name) const -> FeatureSet const*
+	{
+		for (auto const& featureSet : sets)
+		{
+			if (featureSet->getFeatureSetName() == name)
+			{
+				return featureSet;
 			}
 		}
 
-		return static_cast<T const*>(nullptr);
+		return static_cast<FeatureSet const*>(nullptr);
 	}
 
-	template<typename T>
-	auto FeatureList::getFeatureSetByName(string const& name) -> T*
+	auto FeatureList::getFeatureSet(string const& name) -> FeatureSet*
 	{
-		return const_cast<T*>(const_cast<const FeatureList*>(this)->getFeatureSetByName<T>(name));
+		return const_cast<FeatureSet*>(const_cast<const FeatureList*>(this)->getFeatureSet(name));
 	}
 
 	//~~~~~~~~~~~~~~~~~~~~~~
@@ -83,25 +89,23 @@ namespace valkyrie
 		}
 	}
 
-	template<typename T>
-	auto FeatureSet::getFeatureByName(string const& name) const -> T const*
+	auto FeatureSet::getFeature(string const& name) const -> Feature const*
 	{
 		auto const& it = features.find(name);
 
 		if (it == features.end())
 		{
-			return static_cast<T const*>(nullptr);
+			return static_cast<Feature const*>(nullptr);
 		}
-		return dynamic_cast<T const*>(it->second);
+		return it->second;
 	}
 
-	template<typename T>
-	auto FeatureSet::getFeatureByName(string const& name) -> T*
+	auto FeatureSet::getFeature(string const& name) -> Feature*
 	{
-		return const_cast<T*>(const_cast<const FeatureSet*>(this)->getFeatureByName<T>(name));
+		return const_cast<Feature*>(const_cast<const FeatureSet*>(this)->getFeature(name));
 	}
 
-	auto FeatureSet::getSettingByName(string const& name) const -> Setting const*
+	auto FeatureSet::getSetting(string const& name) const -> Setting const*
 	{
 		auto const& it = featureSettings.find(name);
 
@@ -112,8 +116,8 @@ namespace valkyrie
 		return &it->second;
 	}
 
-	auto FeatureSet::getSettingByName(string const& name) -> Setting*
+	auto FeatureSet::getSetting(string const& name) -> Setting*
 	{
-		return const_cast<Setting*>(static_cast<const FeatureSet*>(this)->getSettingByName(name));
+		return const_cast<Setting*>(static_cast<const FeatureSet*>(this)->getSetting(name));
 	}
 }

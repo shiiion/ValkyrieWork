@@ -11,6 +11,15 @@
 
 namespace valkyrie
 {
+	string BoxEsp::featureName = "Box ESP";
+	string BoneEsp::featureName = "Bone ESP";
+	string HealthEsp::featureName = "Health ESP";
+	string NameEsp::featureName = "Name ESP";
+	string DistanceEsp::featureName = "Distance ESP";
+	string WeaponEsp::featureName = "Weapon ESP";
+	string GlowEsp::featureName = "Glow ESP";
+	string EspFeatureSet::setName = "ESP";
+
 	//dont worry too much about lateral diff, will rarely ever be a problem...
 	static bool checkVisibleYaw(vec3 const& target, vec3 const& camera, const float yaw)
 	{
@@ -241,7 +250,7 @@ namespace valkyrie
 	auto EspFeatureSet::execAllFeatures() const -> void
 	{
 		ESPPayload& buffer = getPayloadBuffer();
-		bool teamDrawEnabled = static_cast<bool>(getSettingByName("Draw Team")->iSetting);
+		const bool teamDrawEnabled = (getSetting("Draw Team")->i() != 0);
 
 		if (enabled())
 		{
@@ -265,7 +274,6 @@ namespace valkyrie
 					continue;
 				}
 
-
 				shouldDraw = checkVisibleYaw(player.pos, local.pos, local.rot.y);
 
 				if (shouldDraw)
@@ -282,6 +290,8 @@ namespace valkyrie
 					counter++;
 				}
 			}
+
+			buffer.numPlayers = counter;
 		}
 		else
 		{
