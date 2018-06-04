@@ -221,7 +221,7 @@ static auto manageCSGOMemory() -> void
 			{
 				updateViewMatrix();
 
-				//featureList.execAllFeatures();
+				featureList.execAllFeatures();
 
 				copyBufferToPayload();
 			}

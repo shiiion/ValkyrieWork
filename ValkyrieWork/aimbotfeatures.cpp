@@ -209,7 +209,7 @@ namespace valkyrie
 	//LOL
 	auto RageBot::chooseBone(const uint32_t bestTarget) const -> HitboxID
 	{
-		return getContainerSet()->getSetting("Rage Bodyshots")->i() ? midTorso : head;
+		return getContainerSet()->getSetting("Bodyshots")->i() ? midTorso : head;
 	}
 
 	//ragebot implementation ended ***********************************************************************|

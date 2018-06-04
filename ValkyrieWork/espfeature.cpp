@@ -250,7 +250,7 @@ namespace valkyrie
 	auto EspFeatureSet::execAllFeatures() const -> void
 	{
 		ESPPayload& buffer = getPayloadBuffer();
-		const bool teamDrawEnabled = (getSetting("Draw Team")->i() != 0);
+		const bool teamDrawEnabled = (getSetting("Team ESP")->i() != 0);
 
 		if (enabled())
 		{
