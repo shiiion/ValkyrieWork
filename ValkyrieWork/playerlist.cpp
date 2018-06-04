@@ -4,6 +4,8 @@
 
 namespace valkyrie
 {
+	PlayerList playerList;
+
 	static auto getHitboxSetBase(const uint32_t entBase) -> uint32_t
 	{
 		uint32_t modelHeader, hitboxSetBase;
@@ -32,7 +34,7 @@ namespace valkyrie
 		static_assert(std::is_same<EntityType, BaseCombatWeapon>::value ||
 			std::is_same<EntityType, CSPlayer>::value, "readEntityFromHandle only accepts CSPlayer or BaseCombatWeapon types");
 		
-		readEntityFromIndex(handle & 0xFFF, entity);
+		readEntityFromIndex(listBase, handle & 0xFFF, entity);
 	}
 
 	auto readRadarPlayer(const uint32_t index, RadarPlayer& radarPlayer) -> void
@@ -116,16 +118,6 @@ namespace valkyrie
 		}
 	}
 
-	constexpr auto CSPlayer::validTarget(CSPlayer const& other) const -> bool
-	{
-		return validPlayer() && other.team != team;
-	}
-
-	constexpr auto CSPlayer::validPlayer() const -> bool
-	{
-		return base && (!dormant) && (!isDead);
-	}
-
 	//~~~~~~~~~~~~~~~~~~~~~
 
 	PlayerList::PlayerList() : maxPlayers(0)
@@ -165,16 +157,6 @@ namespace valkyrie
 		{
 			readEntityFromIndex(globals.entityList, index++, player);
 		}
-	}
-
-	constexpr auto PlayerList::getLocalPlayer() const -> CSPlayer const&
-	{
-		return localPlayer;
-	}
-
-	constexpr auto PlayerList::getLocalPlayer() -> CSPlayer&
-	{
-		return localPlayer;
 	}
 
 	auto PlayerList::size() const -> size_t

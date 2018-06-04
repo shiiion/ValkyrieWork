@@ -93,11 +93,6 @@ namespace valkyrie
 		}
 	}
 
-	constexpr auto NetvarReader::tablesRead() const -> bool
-	{
-		return _tablesRead;
-	}
-
 	auto NetvarReader::parseRecvTable(uint32_t tableAddress, uint32_t classID, string const& parent) -> void
 	{
 		constexpr uint32_t propSize = 0x3C;
@@ -108,7 +103,7 @@ namespace valkyrie
 		csgoProc.read<uint32_t>(tableAddress + 0x0C, &tableName, 1);
 
 		char tableNameOut[256];
-		csgoProc.read(tableName, reinterpret_cast<uintptr_t>(tableNameOut), sizeof(tableNameOut));
+		csgoProc.read<char>(tableName, tableNameOut, sizeof(tableNameOut));
 
 		//skip tables which aren't "DT_..."
 		if (tableNameOut[0] != 'D' || tableNameOut[1] != 'T')
@@ -135,7 +130,7 @@ namespace valkyrie
 			char propNameOut[256];
 			csgoProc.read(recvPropBase + (propSize * a) + 0x2C, &offset, 1);
 			csgoProc.read(recvPropBase + (propSize * a), &propName, 1);
-			csgoProc.read(propName, reinterpret_cast<uintptr_t>(propNameOut), sizeof(propNameOut));
+			csgoProc.read<char>(propName, propNameOut, sizeof(propNameOut));
 
 			csgoProc.read(recvPropBase + (propSize * a) + 0x28, &subRecvTable, 1);
 			csgoProc.read(recvPropBase + (propSize * a) + 0x04, &recvType, 1);

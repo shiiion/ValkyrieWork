@@ -71,8 +71,14 @@ namespace valkyrie
 
 		auto readData() -> void;
 
-		constexpr auto validTarget(CSPlayer const& other) const -> bool;
-		constexpr auto validPlayer() const -> bool;
+		constexpr auto validTarget(CSPlayer const& other) const -> bool
+		{
+			return validPlayer() && other.team != team;
+		}
+		constexpr auto validPlayer() const -> bool
+		{
+			return base && (!dormant) && (!isDead);
+		}
 	};
 
 	class PlayerList
@@ -93,8 +99,15 @@ namespace valkyrie
 		auto allocatePlayers() -> void;
 		auto readPlayers() -> void;
 
-		constexpr auto getLocalPlayer() const -> CSPlayer const&;
-		constexpr auto getLocalPlayer() -> CSPlayer&;
+		constexpr auto getLocalPlayer() const -> CSPlayer const&
+		{
+			return localPlayer;
+		}
+
+		constexpr auto getLocalPlayer() -> CSPlayer&
+		{
+			return localPlayer;
+		}
 
 		//cant constexpr,,,
 		auto size() const -> size_t;

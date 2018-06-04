@@ -36,7 +36,7 @@ namespace valkyrie
 					readRadarPlayer(index + 1, extraInfo);
 
 					std::array<char, 32> name;
-					std::wcstombs(name.data, extraInfo.name.data, 32);
+					std::wcstombs(name.data(), extraInfo.name.data(), 32);
 
 					string weaponName;
 					getWeaponName(target.weaponID, weaponName);
@@ -95,10 +95,10 @@ namespace valkyrie
 					for (auto a = hitCounter; a < count; a++)
 					{
 						Hit h = {};
-						h.creationTime = static_cast<uint32_t>(GetTickCount());
-						csgoProc.read(vectorBase + (hitPosSize * a), 
-							reinterpret_cast<uintptr_t>(&h), 
-							sizeof(vec3));
+						h.creationTime = static_cast<float>(GetTickCount());
+						csgoProc.read<vec3>(vectorBase + (hitPosSize * a), 
+							&h.loc, 
+							1);
 						hitList.emplace_back(h);
 					}
 

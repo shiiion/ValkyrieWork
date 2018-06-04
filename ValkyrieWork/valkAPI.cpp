@@ -1,6 +1,5 @@
 #include "valkAPI.h"
 #include <cstdio>
-#include <random>
 
 namespace valkyrie
 {
@@ -15,7 +14,7 @@ namespace valkyrie
 		{
 			return tMat[(r * 4) + c];
 		};
-		const auto rowDot = [](auto r, vec3 const& v) -> float
+		const auto rowDot = [matIdx](auto r, vec3 const& v) -> float
 		{
 			return matIdx(r, 0) * v.x + matIdx(r, 1) * v.y + matIdx(r, 2) * v.z + matIdx(r, 3);
 		};
@@ -63,7 +62,7 @@ namespace valkyrie
 
 	auto vectorAngles(vec3 const& direction, vec3& angles) -> void
 	{
-		float yaw, pitch, temp;
+		float yaw, pitch = 0, temp;
 
 		if (direction.x == 0 && direction.y == 0)
 		{
@@ -98,55 +97,6 @@ namespace valkyrie
 	{
 		AllocConsole();
 		freopen("CONOUT$", "w", stdout);
-	}
-
-	template<constexpr uint32_t attempts, constexpr uint32_t timeoutSeconds, typename callback, typename ...args>
-	auto tryFn(std::atomic_bool const& exitMgr, callback& cb, args&& ... _args) -> bool
-	{
-		for (uint32_t a = 0; (a < attempts) && exitMgr.load(); ++a)
-		{
-			if (cb(std::forward(_args)...))
-			{
-				return true;
-			}
-
-			std::this_thread::sleep_for(std::chrono::seconds(timeoutSeconds));
-		}
-		return false;
-	}
-
-	template<constexpr uint32_t timeoutSeconds, typename callback, typename ...args>
-	auto waitForFn(std::atomic_bool const& exitMgr, callback& cb, args&& ... _args) -> bool
-	{
-		while (exitMgr.load())
-		{
-			if (cb(std::forward(_args)...))
-			{
-				return true;
-			}
-
-			std::this_thread::sleep_for(std::chrono::seconds(timeoutSeconds));
-		}
-		return false;
-	}
-
-	template<typename T>
-	auto random(T min, T max) -> T
-	{
-		static_assert(std::is_integral<T>::value || std::is_floating_point<T>::value,
-			"random types must be integral or floating point");
-
-		std::default_random_engine rnGenerator;
-		if constexpr(std::is_integral<T>::value)
-		{
-			std::uniform_int_distribution<T> distribution(min, max);
-			return distribution(rnGenerator);
-		}
-		if constexpr(std::is_floating_point<T>::value)
-		{
-			std::uniform_real_distribution<T> distribution(min, max);
-			return distribution(rnGenerator);
-		}
 	}
 
 	auto timeSeconds() -> float

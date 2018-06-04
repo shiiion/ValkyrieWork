@@ -45,7 +45,7 @@ namespace valkyrie
 	class RageBot : public Feature
 	{
 	private:
-		const float aimStrength = 0.99999;
+		const float aimStrength = 0.99999f;
 		float aimFov;
 		float aimRandomizeAmt;
 		bool rcsEnabled = false;

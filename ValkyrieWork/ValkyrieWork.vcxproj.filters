@@ -52,6 +52,9 @@
     <ClCompile Include="esprendering.cpp">
       <Filter>Source Files\Features\ESP</Filter>
     </ClCompile>
+    <ClCompile Include="Menu.cpp">
+      <Filter>Source Files\Bad/Old Stuff %28renderer/menu%29</Filter>
+    </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="CD3DFont.h">
@@ -107,6 +110,9 @@
     </ClInclude>
     <ClInclude Include="esprendering.h">
       <Filter>Source Files\Features\ESP</Filter>
+    </ClInclude>
+    <ClInclude Include="Menu.h">
+      <Filter>Source Files\Bad/Old Stuff %28renderer/menu%29</Filter>
     </ClInclude>
   </ItemGroup>
   <ItemGroup>

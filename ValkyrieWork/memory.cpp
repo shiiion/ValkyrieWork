@@ -14,20 +14,46 @@ namespace valkyrie
 		const auto getNibble = [](const char c) -> uint8_t
 		{
 			if (c & '0') { return c - '0'; }
-			if (c & '@') { return c - 'A'; }
+			if (c & '@') { return c - ('A' - 10i8); }
+			return 0;
 		};
 		return (getNibble(byteStr[0]) << 4) | getNibble(byteStr[1]);
+	}
+
+	static auto enumModules(const HANDLE handle, 
+		std::function<bool(MODULEINFO const& modInfo, TCHAR modName[MAX_PATH])> forEach)
+	{
+		HMODULE modules[1024];
+		DWORD needed;
+		if (EnumProcessModulesEx(handle, modules, sizeof(modules), &needed, LIST_MODULES_ALL))
+		{
+			for (uint32_t a = 0; a < (needed / sizeof(HMODULE)); a++)
+			{
+				TCHAR modNameTC[MAX_PATH];
+
+				if (GetModuleFileNameEx(handle, modules[a], modNameTC, sizeof(modNameTC) / sizeof(TCHAR)))
+				{
+					MODULEINFO modInfo;
+					if (GetModuleInformation(handle, modules[a], &modInfo, sizeof(MODULEINFO)))
+					{
+						if (forEach(modInfo, modNameTC))
+						{
+							return;
+						}
+					}
+				}
+			}
+		}
 	}
 
 	//precondition: mask is in format XX XX XX XX, length is 3*numBytes-1
 	static auto patternMatch(unique_ptr<uint8_t[]> const& data, string const& mask, const size_t dataSize) -> uint32_t
 	{
-
 		vector<std::pair<uint8_t, bool>> bytesWithMask;
 		uint8_t* sigAddress = nullptr;
 		
 		bytesWithMask.reserve((mask.length() + 1) / 3);
-		for (uint32_t mb = 0; mb < mask.length; mb += 3)
+		for (uint32_t mb = 0; mb < mask.length(); mb += 3)
 		{
 			bytesWithMask.emplace_back(std::pair<uint8_t, bool>(getByte(&mask[mb]),
 				mask[mb] == '?'));
@@ -44,7 +70,7 @@ namespace valkyrie
 			return badAddr;
 		}
 
-		return reinterpret_cast<uint32_t>(sigAddress);
+		return static_cast<uint32_t>(sigAddress - data.get());
 	}
 
 	auto ProcessMgr32::getProcessIDList(bool refresh) -> map<string, DWORD> const&
@@ -77,11 +103,13 @@ namespace valkyrie
 		return pidMap;
 	}
 
+	map<string, DWORD> ProcessMgr32::pidMap;
+
 	ProcessMgr32::ProcessMgr32() 
 		: handle(INVALID_HANDLE_VALUE, CloseHandle), pID(0u)
 	{
 		//initialize bad module
-		moduleMap["$modulenotfound"] = Module("$modulenotfound", badAddr, 0);
+		moduleMap.emplace(std::make_pair<string, Module>(string("$modulenotfound"), Module("$modulenotfound", badAddr, 0)));
 	}
 
 	auto ProcessMgr32::checkProcessExists(string const& name, const bool refresh) -> bool
@@ -102,37 +130,36 @@ namespace valkyrie
 	auto ProcessMgr32::readModule(Module& m) -> void
 	{
 		m.memory = std::make_unique<uint8_t[]>(m.moduleSize);
-		if (!read(m.baseAddress, reinterpret_cast<uintptr_t>(m.memory.get()), m.moduleSize))
+		if (!read<uint8_t>(m.baseAddress, m.memory.get(), m.moduleSize))
 		{
 			m.memory.reset();
 		}
 	}
 
+	auto ProcessMgr32::moduleExists(string const& name) const -> bool
+	{
+		bool exists = false;
+		enumModules(handle.get(), [&exists, &name](auto const& moduleInfo, TCHAR modNameTC[MAX_PATH]) -> bool
+		{
+			string modName = string(modNameTC);
+			modName = modName.substr(modName.find_last_of("/\\") + 1);
+			return exists = (modName == name);
+		});
+		return exists;
+	}
+
 	void ProcessMgr32::loadModules()
 	{
-		//use windows types here
-		HMODULE modules[1024];
-		DWORD needed;
-		if(EnumProcessModulesEx(handle.get(), modules, sizeof(modules), &needed, LIST_MODULES_ALL))
+		auto& mmapRef = moduleMap;
+		enumModules(handle.get(), [&mmapRef, this](auto const& moduleInfo, TCHAR modNameTC[MAX_PATH]) -> bool
 		{
-			for (uint32_t a = 0; a < (needed / sizeof(HMODULE)); a++)
-			{
-				TCHAR modNameTC[MAX_PATH];
-
-				if (GetModuleFileNameEx(handle.get(), modules[a], modNameTC, sizeof(modNameTC) / sizeof(TCHAR)))
-				{
-					MODULEINFO modInfo;
-					if (GetModuleInformation(handle.get(), modules[a], &modInfo, sizeof(MODULEINFO)))
-					{
-						string modName = string(modNameTC);
-						modName = modName.substr(modName.find_last_of("/\\") + 1);
-						Module newMod(modName, reinterpret_cast<uint32_t>(modInfo.lpBaseOfDll), modInfo.SizeOfImage);
-						readModule(newMod);
-						moduleMap[modName] = std::move(newMod);
-					}
-				}
-			}
-		}
+			string modName = string(modNameTC);
+			modName = modName.substr(modName.find_last_of("/\\") + 1);
+			Module newMod(modName, reinterpret_cast<uint32_t>(moduleInfo.lpBaseOfDll), moduleInfo.SizeOfImage);
+			this->readModule(newMod);
+			mmapRef[modName] = std::move(newMod);
+			return false;
+		});
 	}
 
 	auto ProcessMgr32::getModule(string const& name) const -> Module const&
@@ -145,38 +172,6 @@ namespace valkyrie
 		{
 			return moduleMap.at("$modulenotfound");
 		}
-	}
-
-	auto ProcessMgr32::read(const uint32_t address, uintptr_t buffer, const size_t size) -> bool
-	{
-		size_t bytesRead = 0;
-		return ReadProcessMemory(handle.get(), reinterpret_cast<LPCVOID>(address), reinterpret_cast<LPVOID>(buffer), size, &bytesRead);
-	}
-
-	auto ProcessMgr32::write(const uint32_t address, uintptr_t buffer, const size_t size) -> bool
-	{
-		size_t bytesWritten = 0;
-		return WriteProcessMemory(handle.get(), reinterpret_cast<LPVOID>(address), reinterpret_cast<LPVOID>(buffer), size, &bytesWritten);
-	}
-
-	template<typename T>
-	auto ProcessMgr32::read(const uint32_t address, T* buffer, const size_t length) -> bool
-	{
-		return read(address, static_cast<uintptr_t>(buffer), length * sizeof(T));
-	}
-
-	template<typename T>
-	auto ProcessMgr32::write(const uint32_t address, T* buffer, const size_t length) -> bool
-	{
-		return write(address, static_cast<uintptr_t>(buffer), length * sizeof(T));
-	}
-
-	template<typename T>
-	auto ProcessMgr32::read(const uint32_t address) -> T
-	{
-		T buffer;
-		read(address, static_cast<uintptr_t>(&buffer), sizeof(T));
-		return buffer;
 	}
 
 	auto ProcessMgr32::isInitialized() const -> const bool
@@ -192,7 +187,7 @@ namespace valkyrie
 	auto ProcessMgr32::sigScan(string const& signature, string const& searchModule) const -> uint32_t
 	{
 		//32 bit men
-		uint32_t sigAddress;
+		uint32_t sigAddress = badAddr;
 		auto&& kvIter = moduleMap.find(searchModule);
 		if (kvIter != moduleMap.end())
 		{

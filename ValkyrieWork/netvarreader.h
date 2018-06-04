@@ -32,7 +32,10 @@ namespace valkyrie
 
 		auto printTables() const -> void;
 
-		constexpr auto tablesRead() const -> bool;
+		constexpr auto tablesRead() const -> bool
+		{
+			return _tablesRead;
+		}
 
 		auto getTable(string const& className) const -> RecvTable const&
 		{

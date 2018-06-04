@@ -2,6 +2,8 @@
 
 namespace valkyrie
 {
+	FeatureList featureList;
+
 	auto FeatureList::initFeatures() -> void
 	{
 		//initialize stuff here
@@ -42,7 +44,7 @@ namespace valkyrie
 	{
 		for (auto const& featureSet : sets)
 		{
-			T* f = featureSet.getFeatureByName<T>(name);
+			T const* f = featureSet.getFeatureByName<T>(name);
 			if (f != nullptr)
 			{
 				return f;

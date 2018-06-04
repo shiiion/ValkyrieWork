@@ -165,7 +165,7 @@ namespace renderer
 	VOID CRenderer::DrawCircle(FLOAT X, FLOAT Y, FLOAT Radius, FLOAT Sides, DWORD dColor1)
 	{
 		D3DXVECTOR2 Line[128];
-		FLOAT Step = valkyrie::pi * 2.0 / Sides;
+		FLOAT Step = valkyrie::pi * 2.0f / Sides;
 		INT Count = 0;
 		for (FLOAT a = 0; a < valkyrie::pi * 2.0; a += Step)
 		{
@@ -257,10 +257,10 @@ namespace renderer
 		D3DVIEWPORT9 pViewPort;
 		pDevice->GetViewport(&pViewPort);
 
-		FLOAT X = GetSystemMetrics(SM_CXSCREEN) / 2;
-		FLOAT Y = GetSystemMetrics(SM_CYSCREEN) / 2;
+		FLOAT X = GetSystemMetrics(SM_CXSCREEN) / 2.f;
+		FLOAT Y = GetSystemMetrics(SM_CYSCREEN) / 2.f;
 
-		DrawCircle(X - 0.5, Y - 0.5, 7.0f, 50.0f, dColor1);
+		DrawCircle(X - 0.5f, Y - 0.5f, 7.0f, 50.0f, dColor1);
 	}
 
 	VOID CRenderer::DrawCursor(FLOAT X, FLOAT Y)
@@ -322,7 +322,7 @@ namespace renderer
 	hsv CRenderer::rgb2hsv(rgb in)
 	{
 		hsv         out;
-		double      min, max, delta;
+		float      min, max, delta;
 
 		min = in.r < in.g ? in.r : in.g;
 		min = min < in.b ? min : in.b;
@@ -332,19 +332,19 @@ namespace renderer
 
 		out.v = max;                                // v
 		delta = max - min;
-		if (delta < 0.00001)
+		if (delta < 0.00001f)
 		{
 			out.s = 0;
 			out.h = 0; // undefined, maybe nan?
 			return out;
 		}
-		if (max > 0.0) { // NOTE: if Max is == 0, this divide would cause a crash
+		if (max > 0.0f) { // NOTE: if Max is == 0, this divide would cause a crash
 			out.s = (delta / max);                  // s
 		}
 		else {
 			// if max is 0, then r = g = b = 0              
 			// s = 0, h is undefined
-			out.s = 0.0;
+			out.s = 0.0f;
 			out.h = NAN;                            // its now undefined
 			return out;
 		}
@@ -352,14 +352,14 @@ namespace renderer
 			out.h = (in.g - in.b) / delta;        // between yellow & magenta
 		else
 			if (in.g >= max)
-				out.h = 2.0 + (in.b - in.r) / delta;  // between cyan & yellow
+				out.h = 2.0f + (in.b - in.r) / delta;  // between cyan & yellow
 			else
-				out.h = 4.0 + (in.r - in.g) / delta;  // between magenta & cyan
+				out.h = 4.0f + (in.r - in.g) / delta;  // between magenta & cyan
 
-		out.h *= 60.0;                              // degrees
+		out.h *= 60.0f;                              // degrees
 
-		if (out.h < 0.0)
-			out.h += 360.0;
+		if (out.h < 0.0f)
+			out.h += 360.0f;
 
 		return out;
 	}
@@ -367,24 +367,24 @@ namespace renderer
 
 	rgb CRenderer::hsv2rgb(hsv in)
 	{
-		double      hh, p, q, t, ff;
+		float      hh, p, q, t, ff;
 		long        i;
 		rgb         out;
 
-		if (in.s <= 0.0) {       // < is bogus, just shuts up warnings
+		if (in.s <= 0.0f) {       // < is bogus, just shuts up warnings
 			out.r = in.v;
 			out.g = in.v;
 			out.b = in.v;
 			return out;
 		}
 		hh = in.h;
-		if (hh >= 360.0) hh = 0.0;
-		hh /= 60.0;
+		if (hh >= 360.0f) hh = 0.0f;
+		hh /= 60.0f;
 		i = (long)hh;
 		ff = hh - i;
-		p = in.v * (1.0 - in.s);
-		q = in.v * (1.0 - (in.s * ff));
-		t = in.v * (1.0 - (in.s * (1.0 - ff)));
+		p = in.v * (1.0f - in.s);
+		q = in.v * (1.0f - (in.s * ff));
+		t = in.v * (1.0f - (in.s * (1.0f - ff)));
 
 		switch (i) {
 		case 0:

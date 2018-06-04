@@ -1,6 +1,7 @@
 #pragma once
 
 #include "res.h"
+#include <random>
 
 //logging cut out in release
 #ifdef Development
@@ -23,15 +24,55 @@ namespace valkyrie
 	auto openConsole() -> void;
 
 	//Generic fail-safes
-	template<constexpr uint32_t attempts, constexpr uint32_t timeoutSeconds, typename callback, typename ...args>
-	auto tryFn(std::atomic_bool const& exitMgr, callback& cb, args&& ... _args) -> bool;
-	
-	template<constexpr uint32_t timeoutSeconds, typename callback, typename ...args>
-	auto waitForFn(std::atomic_bool const& exitMgr, callback& cb, args&& ... _args) -> bool;
+	template<uint32_t attempts, uint32_t timeoutSeconds, typename callback, typename ... args>
+	auto tryFn(std::atomic_bool const& exitMgr, callback& cb, args&& ... _args) -> bool
+	{
+		for (uint32_t a = 0; (a < attempts) && exitMgr.load(); ++a)
+		{
+			if (cb(std::forward<args>(_args)...))
+			{
+				return true;
+			}
+
+			std::this_thread::sleep_for(std::chrono::seconds(timeoutSeconds));
+		}
+		return false;
+	}
+
+	template<uint32_t timeoutSeconds, typename callback, typename ... args>
+	auto waitForFn(std::atomic_bool const& exitMgr, callback& cb, args&& ... _args) -> bool
+	{
+		while (exitMgr.load())
+		{
+			if (cb(std::forward<args>(_args)...))
+			{
+				return true;
+			}
+
+			std::this_thread::sleep_for(std::chrono::seconds(timeoutSeconds));
+		}
+		return false;
+	}
 
 	//uniform distribution random
 	template<typename T>
-	auto random(T min, T max) -> T;
+	auto random(T min, T max) -> T
+	{
+		static_assert(std::is_integral<T>::value || std::is_floating_point<T>::value,
+			"random types must be integral or floating point");
+
+		std::default_random_engine rnGenerator;
+		if constexpr(std::is_integral<T>::value)
+		{
+			std::uniform_int_distribution<T> distribution(min, max);
+			return distribution(rnGenerator);
+		}
+		if constexpr(std::is_floating_point<T>::value)
+		{
+			std::uniform_real_distribution<T> distribution(min, max);
+			return distribution(rnGenerator);
+		}
+	}
 
 	//time since start of program
 	auto timeSeconds() -> float;

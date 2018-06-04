@@ -6,21 +6,25 @@
 
 namespace valkyrie
 {
+	Globals globals;
+
 	auto initializeGlobals() -> bool
 	{
 		initializeSignatures();
 		if (!checkAllSignatures())
 		{
+			PRINTLN_LOG("WHY");
 			return false;
 		}
 
 		globals.entityList = entityListSigs.getSigAddress();
-		globals.clientState = clientStateSigs.getSigAddress();
+		csgoProc.read(clientStateSigs.getSigAddress(), &globals.clientState, 1);
+		//globals.clientState = clientStateSigs.getSigAddress();
 
 		globals.localPlayer = localPlayerSigs.getSigAddress() + localPlayerOffsetSigs.getSigAddress();
 		
 		globals.cRender = cRenderSigs.getSigAddress();
-		globals.viewAngles = viewAngleSigs.getSigAddress();
+		csgoProc.read(viewAngleSigs.getSigAddress(), &globals.viewAngles, 1);
 		globals.radarBase = radarSigs.getSigAddress();
 		globals.forceJump = forceJumpSigs.getSigAddress();
 		//now THIs is munted
@@ -38,9 +42,11 @@ namespace valkyrie
 		}
 
 		globals.dataTable = dataTable.getSigAddress();
-		csgoProc.read(inputSystemSigs.getSigAddress() + 0x06, &globals.commandContext, 1);
-		csgoProc.read(inputSystemSigs.getSigAddress() - 0x35, &globals.commandContextMutex, 1);
+		//FIX THESE YAY!!
+		csgoProc.read(commandContextSigs.getSigAddress() + 0x06, &globals.commandContext, 1);
+		csgoProc.read(commandContextSigs.getSigAddress() - 0x35, &globals.commandContextMutex, 1);
 
+		//FIX THIS TOO? ? 
 		globals.scaleFormUI = scaleformUISigs.getSigAddress();
 		globals.chatOpen = chatOpenOffsetSigs.getSigAddress();
 
@@ -50,6 +56,7 @@ namespace valkyrie
 		globals.entOffs.boneMatrix = boneMatrixSigs.getSigAddress() + 0x04;
 		globals.entOffs.modelHeader = modelHeaderSigs.getSigAddress();
 		globals.otherOffs.gameState = isInGameOffsetSigs.getSigAddress();
+		//FIX THIS!?!?
 		globals.otherOffs.maxPlayers = maxPlayerOffsetSigs.getSigAddress() + 0x08;
 		globals.otherOffs.viewAngle = viewAngleOffsetSigs.getSigAddress();
 
@@ -71,15 +78,15 @@ namespace valkyrie
 			return false;
 		}
 
-		const auto const& baseEntityTable = netvarReader.getTable("DT_BaseEntity");
-		const auto const& basePlayerTable = netvarReader.getTable("DT_BasePlayer");
-		const auto const& csPlayerTable = netvarReader.getTable("DT_CSPlayer");
-		const auto const& lpExclusiveTable = netvarReader.getTable("DT_LocalPlayerExclusive");
-		const auto const& cslpExclusiveTable = netvarReader.getTable("DT_CSLocalPlayerExclusive");
-		const auto const& localTable = netvarReader.getTable("DT_Local");
-		const auto const& econEntityTable = netvarReader.getTable("DT_EconEntity");
-		const auto const& attributeContainerTable = netvarReader.getTable("DT_AttributeContainer");
-		const auto const& scriptCreatedItemTable = netvarReader.getTable("DT_ScriptCreatedItem");
+		auto const& baseEntityTable = netvarReader.getTable("DT_BaseEntity");
+		auto const& basePlayerTable = netvarReader.getTable("DT_BasePlayer");
+		auto const& csPlayerTable = netvarReader.getTable("DT_CSPlayer");
+		auto const& lpExclusiveTable = netvarReader.getTable("DT_LocalPlayerExclusive");
+		auto const& cslpExclusiveTable = netvarReader.getTable("DT_CSLocalPlayerExclusive");
+		auto const& localTable = netvarReader.getTable("DT_Local");
+		auto const& econEntityTable = netvarReader.getTable("DT_EconEntity");
+		auto const& attributeContainerTable = netvarReader.getTable("DT_AttributeContainer");
+		auto const& scriptCreatedItemTable = netvarReader.getTable("DT_ScriptCreatedItem");
 
 		globals.entOffs.team = baseEntityTable.getPropOffset("m_iTeamNum");
 

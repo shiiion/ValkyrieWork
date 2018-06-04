@@ -29,7 +29,7 @@ namespace renderer
 	static const color cyan			= color(0x00ui8, 0xFFui8, 0xFFui8, 0xFFui8);
 	static const color violet		= color(0xFFui8, 0x00ui8, 0xFFui8, 0xFFui8);
 
-	static struct ColorConfig
+	struct ColorConfig
 	{
 		color boxColors[2];
 		color headBoxColors[2];
@@ -49,7 +49,7 @@ namespace renderer
 
 	static ColorConfig colorConfigs[] = { ColorConfig(yellow, cyan, red, purple, white, white), ColorConfig(yellow, violet, red, cyan, orange, blue) };
 
-	static struct TextStack
+	struct TextStack
 	{
 		//t1: text ptr
 		//t2: isWide (false if MB)
@@ -138,39 +138,40 @@ namespace renderer
 
 	static auto drawBox3d(std::array<vec2, 8> const& vertices, const color outer, const color inner) -> void
 	{
-		const auto drawBoxInternal = [](std::array<vec2, 8> const& v, const color c, float thickness) -> void
+		const auto drawBoxInternal = [](std::array<vec2, 8> const& v, const color c, const float thickness) -> void
 		{
-			std::array<bool, 8> bounds;
+			//there is literally an internal compiler error if i make this an std::array<bool, 8>, no joke
+			bool boundsArr[8];
 			for (auto a = 0u; a < v.size(); a++)
 			{
-				bounds[a] = boundsCheck(v[a]);
+				boundsArr[a] = boundsCheck(v[a]);
 			}
 
-			if (bounds[0] && bounds[1])
+			if (boundsArr[0] && boundsArr[1])
 				drawLine(v[0], v[1], c, thickness);
-			if (bounds[1] && bounds[2])
+			if (boundsArr[1] && boundsArr[2])
 				drawLine(v[1], v[2], c, thickness);
-			if (bounds[2] && bounds[3])
+			if (boundsArr[2] && boundsArr[3])
 				drawLine(v[2], v[3], c, thickness);
-			if (bounds[3] && bounds[0])
+			if (boundsArr[3] && boundsArr[0])
 				drawLine(v[3], v[0], c, thickness);
 
-			if (bounds[0] && bounds[4])
+			if (boundsArr[0] && boundsArr[4])
 				drawLine(v[0], v[4], c, thickness);
-			if (bounds[1] && bounds[5])
+			if (boundsArr[1] && boundsArr[5])
 				drawLine(v[1], v[5], c, thickness);
-			if (bounds[2] && bounds[6])
+			if (boundsArr[2] && boundsArr[6])
 				drawLine(v[2], v[6], c, thickness);
-			if (bounds[3] && bounds[7])
+			if (boundsArr[3] && boundsArr[7])
 				drawLine(v[3], v[7], c, thickness);
 
-			if (bounds[4] && bounds[5])
+			if (boundsArr[4] && boundsArr[5])
 				drawLine(v[4], v[5], c, thickness);
-			if (bounds[5] && bounds[6])
+			if (boundsArr[5] && boundsArr[6])
 				drawLine(v[5], v[6], c, thickness);
-			if (bounds[6] && bounds[7])
+			if (boundsArr[6] && boundsArr[7])
 				drawLine(v[6], v[7], c, thickness);
-			if (bounds[7] && bounds[4])
+			if (boundsArr[7] && boundsArr[4])
 				drawLine(v[7], v[4], c, thickness);
 		};
 

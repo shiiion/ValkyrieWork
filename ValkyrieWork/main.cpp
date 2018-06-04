@@ -12,6 +12,7 @@
 #include "esprendering.h"
 
 #include "Renderer.h"
+#include "Menu.h"
 
 #include <dwmapi.h>
 
@@ -27,10 +28,10 @@ using namespace valkyrie;
 typedef std::tuple<HWND, LPDIRECT3D9, LPDIRECT3DDEVICE9> WindowTuple_t;
 
 template<typename T>
-using DXObject = std::unique_ptr<std::remove_pointer_t<T>, void(*)(T*)>;
+using DXObject = std::unique_ptr<std::remove_pointer_t<T>, void(*)(T)>;
 
 template<typename T>
-static auto ReleaseDXObject(T* dxObject) -> void
+static auto ReleaseDXObject(T dxObject) -> void
 {
 	dxObject->Release();
 }
@@ -73,7 +74,7 @@ static auto createD3DWindow(string const& title) -> WindowTuple_t
 {
 	constexpr auto windowFlags = WS_EX_TOPMOST | WS_EX_LAYERED | WS_EX_COMPOSITED | WS_EX_TRANSPARENT;
 	
-	const MARGINS margin = { 0, 0, globals.screenWidth, globals.screenHeight };
+	const MARGINS margin = { 0, 0, static_cast<int32_t>(globals.screenWidth), static_cast<int32_t>(globals.screenHeight) };
 	const auto WndProc = [](auto hwnd, auto message, auto wParam, auto lParam) -> LRESULT
 	{
 		switch (message)
@@ -147,6 +148,8 @@ static auto renderFrame(DXObject<LPDIRECT3DDEVICE9> const& device) -> void
 		renderer::pRenderer->Create(device.get());
 		renderer::pRenderer->Begin();
 
+		//menu::Menu.RenderFramework();
+
 		copyOutPayload(payload);
 
 		if (payload.shouldDraw)
@@ -167,12 +170,28 @@ static auto renderFrame(DXObject<LPDIRECT3DDEVICE9> const& device) -> void
 
 static auto manageCSGOMemory() -> void
 {
-	constexpr long threadSleepTime = 1;
+	constexpr long threadSleepTime = 1l;
 
-	waitForFn<5>(memThreadState, ProcessMgr32::checkProcessExists, "csgo.exe", true);
+	waitForFn<5u>(memThreadState, ProcessMgr32::checkProcessExists, string("csgo.exe"), true);
 	const DWORD csgoPID = ProcessMgr32::getProcessIDList(false).at("csgo.exe");
 
-	if (!csgoProc.openProcessById(csgoPID) ||
+	const auto openAndLoadMods = [](const DWORD csgoPID) -> bool
+	{
+		if (csgoProc.openProcessById(csgoPID))
+		{
+			const auto checkClientDll = []() -> bool
+			{
+				return csgoProc.moduleExists("client.dll");
+			};
+
+			waitForFn<5u>(memThreadState, checkClientDll);
+			csgoProc.loadModules();
+			return true;
+		}
+		return false;
+	};
+
+	if (!openAndLoadMods(csgoPID) ||
 		!tryFn<20, 7>(memThreadState, initializeGlobals))
 	{
 		mainThreadState = false;
@@ -212,6 +231,7 @@ static auto manageCSGOMemory() -> void
 
 int WINAPI WinMain(HINSTANCE hInst, HINSTANCE hPrevInstance, LPSTR lpCmdLine, int nCmdShow)
 {
+	valkyrie::openConsole();
 	//don't do if csgo exists
 	if (ProcessMgr32::checkProcessExists("csgo.exe", true))
 	{

@@ -185,9 +185,9 @@ namespace valkyrie
 		
 		if (state <= 1u)
 		{
-			csgoProc.read(globals.cRender + 0x9Cu, 
-				reinterpret_cast<uintptr_t>(viewMatrix), 
-				sizeof(matrix_t));
+			csgoProc.read<float>(globals.cRender + 0x9Cu, 
+				viewMatrix, 
+				16);
 		}
 		else
 		{
@@ -195,13 +195,13 @@ namespace valkyrie
 			csgoProc.read(globals.cRender + 0xDCu, &off2, 1u);
 
 			const uint32_t finalAddr = (0x210u * 2u) + off2 - 0x44u;
-			csgoProc.read(globals.cRender + 0x9Cu,
-				reinterpret_cast<uintptr_t>(viewMatrix),
-				sizeof(matrix_t));
+			csgoProc.read<float>(globals.cRender + 0x9Cu,
+				viewMatrix,
+				16);
 		}
 	}
 
-	constexpr auto getViewMatrix() -> const pmatrix_t
+	auto getViewMatrix() -> const pmatrix_t
 	{
 		return static_cast<const pmatrix_t>(viewMatrix);
 	}
