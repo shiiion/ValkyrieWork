@@ -5,6 +5,7 @@
 
 #include "memory.h"
 #include "globals.h"
+#include "resource.h"
 
 #include "RenderPayload.h"
 
@@ -17,6 +18,11 @@ namespace valkyrie
 	string HitMarkerFeature::featureName = "Hitmarkers";
 	string GlowEsp::featureName = "Glow";
 	string MiscFeatureSet::setName = "Miscellaneous";
+
+	static auto playHitmarkerSound() -> void
+	{
+		PlaySound(MAKEINTRESOURCE(IDR_WAVE1), nullptr, SND_RESOURCE | SND_ASYNC);
+	}
 
 	auto SpamChatFeature::execFeature() const -> void
 	{
@@ -39,7 +45,7 @@ namespace valkyrie
 					lastPlayerIndex = index + 1u;
 
 					RadarPlayer extraInfo;
-					readRadarPlayer(index + 1, extraInfo);
+					readRadarPlayer(index, extraInfo);
 
 					std::array<char, 32> name;
 					std::wcstombs(name.data(), extraInfo.name.data(), 32);
@@ -107,10 +113,10 @@ namespace valkyrie
 							1);
 						h.creationTime = startTime;
 						hitList.emplace_back(h);
+						newHit = true;
 					}
 
 					hitCounter = count;
-					newHit = true;
 				}
 
 				while (hitList.size() &&
@@ -134,7 +140,7 @@ namespace valkyrie
 
 				if (newHit)
 				{
-					//TODO: make sound here
+					playHitmarkerSound();
 				}
 			}
 		}

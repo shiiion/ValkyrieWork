@@ -90,7 +90,7 @@
     </ClCompile>
     <Link>
       <AdditionalLibraryDirectories>C:\Program Files %28x86%29\Microsoft DirectX SDK %28June 2010%29\Lib\x64;%(AdditionalLibraryDirectories)</AdditionalLibraryDirectories>
-      <AdditionalDependencies>d3dx9.lib;d3d9.lib;dwmapi.lib;%(AdditionalDependencies)</AdditionalDependencies>
+      <AdditionalDependencies>d3dx9.lib;d3d9.lib;dwmapi.lib;winmm.lib;%(AdditionalDependencies)</AdditionalDependencies>
     </Link>
   </ItemDefinitionGroup>
   <ItemDefinitionGroup Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">
@@ -160,9 +160,16 @@
     <ClInclude Include="Renderer.h" />
     <ClInclude Include="renderpayload.h" />
     <ClInclude Include="res.h" />
+    <ClInclude Include="resource.h" />
     <ClInclude Include="signaturelist.h" />
     <ClInclude Include="valkAPI.h" />
     <ClInclude Include="vector.h" />
+  </ItemGroup>
+  <ItemGroup>
+    <ResourceCompile Include="ValkyrieWork.rc" />
+  </ItemGroup>
+  <ItemGroup>
+    <Media Include="hitmarker_2.wav" />
   </ItemGroup>
   <Import Project="$(VCTargetsPath)\Microsoft.Cpp.targets" />
   <ImportGroup Label="ExtensionTargets">

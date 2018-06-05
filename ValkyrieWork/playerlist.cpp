@@ -85,7 +85,7 @@ namespace valkyrie
 		csgoProc.read(base + globals.entOffs.moveState, &moveState, 1);
 		csgoProc.read(base + globals.entOffs.viewPunch, &viewPunch, 1);
 		csgoProc.read(base + globals.entOffs.aimPunch, &aimPunch, 1);
-		csgoProc.read(base + globals.entOffs.lastPlaceName, &callout[0], 1);
+		csgoProc.read(base + globals.entOffs.lastPlaceName, &callout[0], 32);
 		csgoProc.read(base + globals.entOffs.detectedBySensor, &sensorTime, 1);
 
 		{

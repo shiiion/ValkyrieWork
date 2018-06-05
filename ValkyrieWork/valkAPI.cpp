@@ -1,12 +1,13 @@
 #include "valkAPI.h"
+#include "globals.h"
 #include <cstdio>
 
 namespace valkyrie
 {
 	auto worldToScreen(vec3 const& origin, vec2& screenOut, const matrix_t tMat) -> bool
 	{
-		const float width = static_cast<float>(1920);
-		const float height = static_cast<float>(1080);//get from sysmetrics
+		const float width = static_cast<float>(globals.screenWidth);
+		const float height = static_cast<float>(globals.screenHeight);//get from sysmetrics
 		const float halfWidth = width * 0.5f;
 		const float halfHeight = height * 0.5f;
 
@@ -79,14 +80,14 @@ namespace valkyrie
 		else
 		{
 			yaw = toDeg(atan2(direction.y, direction.x));
-			if (yaw < 0.f)
+			if (yaw < -180.f)
 				yaw += 360.f;
 
 			temp = sqrt(direction.x * direction.x + direction.y * direction.y);
-			temp = toDeg(atan2(-direction.z, temp));
-			if (pitch < 0.f)
+			pitch = toDeg(atan2(-direction.z, temp));
+			if (!range<float>(pitch, -89.f, 89.f))
 			{
-				pitch += 360.f;
+				pitch = 89.f * static_cast<float>((signbit(pitch) * 2 - 1));
 			}
 		}
 

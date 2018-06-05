@@ -44,13 +44,18 @@ namespace valkyrie
 
 		inline auto distance(vec2 const& other) const -> float
 		{
-			return sqrt(dot(*this - other));
+			return sqrt((*this - other).square());
 		}
 
 		inline auto rotate(const float angle) const -> vec2
 		{
 			const float cos = cosf(angle), sin = sinf(angle);
 			return vec2(y * cos - x * sin, x * cos + y * sin);
+		}
+
+		inline auto square() const -> float
+		{
+			return this->dot(*this);
 		}
 	};
 

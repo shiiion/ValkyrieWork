@@ -120,6 +120,9 @@
     <ClInclude Include="featuremenuinterface.h">
       <Filter>Source Files\Features</Filter>
     </ClInclude>
+    <ClInclude Include="resource.h">
+      <Filter>Resources</Filter>
+    </ClInclude>
   </ItemGroup>
   <ItemGroup>
     <Filter Include="Source Files">
@@ -146,5 +149,18 @@
     <Filter Include="Source Files\Bad/Old Stuff %28renderer/menu%29">
       <UniqueIdentifier>{63f66caa-229c-4dec-adac-fa5ee1c14701}</UniqueIdentifier>
     </Filter>
+    <Filter Include="Resources">
+      <UniqueIdentifier>{91143e4b-2747-4615-a458-aa19febc4a01}</UniqueIdentifier>
+    </Filter>
+  </ItemGroup>
+  <ItemGroup>
+    <ResourceCompile Include="ValkyrieWork.rc">
+      <Filter>Resources</Filter>
+    </ResourceCompile>
+  </ItemGroup>
+  <ItemGroup>
+    <Media Include="hitmarker_2.wav">
+      <Filter>Resources</Filter>
+    </Media>
   </ItemGroup>
 </Project>

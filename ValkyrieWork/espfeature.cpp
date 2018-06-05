@@ -19,35 +19,10 @@ namespace valkyrie
 	string WeaponEsp::featureName = "Weapon ESP";
 	string EspFeatureSet::setName = "ESP";
 
-	//dont worry too much about lateral diff, will rarely ever be a problem...
-	static bool checkVisibleYaw(vec3 const& target, vec3 const& camera, const float yaw)
+	static bool checkVisible(CSPlayer const& target, vec3 const& camera)
 	{
-		constexpr float fovExtension = 5.0f;
+		std::array<vec3, 8> positions;
 
-		//assumed FOV
-		constexpr float fov = 45.f + fovExtension;
-		const float realYaw = yaw + 180.f;
-
-		const vec3 diff = target - camera;
-		const float diffAngle = toDeg(diff.xyRotation()) + 180.f;
-
-		//hit upper bound
-		if (realYaw + fov > 360.f)
-		{
-			const float yawOverlap = 360.f - realYaw + fov;
-			return range<float>(diffAngle, 0, yawOverlap) ||
-				range<float>(diffAngle, realYaw - fov, 360.f);
-		}
-		else if (realYaw - fov < 0.f)//hit lower bound
-		{
-			const float yawOverlap = realYaw - fov;
-			return range<float>(diffAngle, 360.f + yawOverlap, 360.f) ||
-				range<float>(diffAngle, 0, realYaw + fov);
-		}
-		else //no bound overlap
-		{
-			return range<float>(diffAngle, realYaw - fov, realYaw + fov);
-		}
 	}
 
 	static auto getVertices(vec3 const& maxes, vec3 const& mins, std::array<vec3, 8>& vOut)
@@ -117,7 +92,7 @@ namespace valkyrie
 	auto BoxEsp::execFeature() const -> void
 	{
 		ESPPayload& buffer = getPayloadBuffer();
-		PlayerPayload& playerPayload = buffer.players[index];
+		PlayerPayload& playerPayload = buffer.players[payloadIndex];
 
 		vec3 absMin = player->pos + player->bboxMin;
 		vec3 absMax = player->pos + player->bboxMax;
@@ -137,7 +112,7 @@ namespace valkyrie
 	auto BoneEsp::execFeature() const -> void
 	{
 		ESPPayload& buffer = getPayloadBuffer();
-		PlayerPayload& playerPayload = buffer.players[index];
+		PlayerPayload& playerPayload = buffer.players[payloadIndex];
 
 		buffer.drawBones = static_cast<bool>(setting());
 
@@ -159,19 +134,16 @@ namespace valkyrie
 	auto HealthEsp::execFeature() const -> void
 	{
 		ESPPayload& buffer = getPayloadBuffer();
-		PlayerPayload& playerPayload = buffer.players[index];
+		PlayerPayload& playerPayload = buffer.players[payloadIndex];
 
 		buffer.drawHealth = static_cast<bool>(setting());
-		if (setting() == settingEnabled)
-		{
-			playerPayload.health = player->health;
-		}
+		playerPayload.health = player->health;
 	}
 
 	auto NameEsp::execFeature() const -> void
 	{
 		ESPPayload& buffer = getPayloadBuffer();
-		PlayerPayload& playerPayload = buffer.players[index];
+		PlayerPayload& playerPayload = buffer.players[payloadIndex];
 
 		buffer.drawName = static_cast<bool>(setting());
 
@@ -195,7 +167,7 @@ namespace valkyrie
 	auto DistanceEsp::execFeature() const -> void
 	{
 		ESPPayload& buffer = getPayloadBuffer();
-		PlayerPayload& playerPayload = buffer.players[index];
+		PlayerPayload& playerPayload = buffer.players[payloadIndex];
 
 		buffer.drawDistance = static_cast<bool>(setting());
 
@@ -209,7 +181,7 @@ namespace valkyrie
 	auto WeaponEsp::execFeature() const -> void
 	{
 		ESPPayload& buffer = getPayloadBuffer();
-		PlayerPayload& playerPayload = buffer.players[index];
+		PlayerPayload& playerPayload = buffer.players[payloadIndex];
 
 		buffer.drawWeaponName = static_cast<bool>(setting());
 
@@ -250,8 +222,6 @@ namespace valkyrie
 					continue;
 				}
 
-				shouldDraw = checkVisibleYaw(player.pos, local.pos + local.viewOffset, local.rot.y);
-
 				if (shouldDraw)
 				{
 					buffer.shouldDraw = true;
@@ -260,7 +230,8 @@ namespace valkyrie
 					{
 						EspFeature const* feature = dynamic_cast<EspFeature const*>(kv.second);
 						feature->player = &player;
-						feature->index = counter;
+						feature->index = a;
+						feature->payloadIndex = counter;
 						kv.second->execFeature();
 					}
 					counter++;

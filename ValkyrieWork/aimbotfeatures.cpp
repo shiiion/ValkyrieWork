@@ -97,7 +97,6 @@ namespace valkyrie
 		vec3 viewAngles;
 		csgoProc.read<vec3>(globals.viewAngles + globals.otherOffs.viewAngle, &viewAngles, 1u);
 
-		vec3 viewPunchCalc;
 
 		//randomize , percent subject to change
 		//what??
@@ -112,11 +111,12 @@ namespace valkyrie
 		//const vec3 randomRecoil = vec3(random<float>(lowerAimpunchX, upperAimpunchX), random<float>(lowerAimpunchY, upperAimpunchY), 0);
 
 		//compensate for random rcs
-		viewPunchCalc = viewPunchCalc + (((playerList.getLocalPlayer().aimPunch * 2.f)/* + randomRecoil*/) + playerList.getLocalPlayer().viewPunch);
+		const vec3 viewPunchCalc = viewAngles + (((playerList.getLocalPlayer().aimPunch * 2.f)/* + randomRecoil*/) + playerList.getLocalPlayer().viewPunch);
 
 		vec3 angles;
 		vectorAngles(enemyPos - localPos, angles);
 		normalizeAngles(angles);
+		clampAngles(angles);
 		//Aimbot changes where it aims based on whether RCS enabled or not.
 		vec3 deltaAngles = rcsEnabled ? vec3(angles.x - viewPunchCalc.x, angles.y - viewPunchCalc.y, 0)
 			: vec3(angles.x - viewAngles.x, angles.y - viewAngles.y, 0);
@@ -177,7 +177,7 @@ namespace valkyrie
 		if (bestTarget >= 0)
 		{
 			//performance bump from using vectors
-			const std::array<HitboxID, 10>  hitboxes = { head,neck,rightShoulder,leftShoulder,upperTorso,
+			constexpr std::array<HitboxID, 10>  hitboxes = { head,neck,rightShoulder,leftShoulder,upperTorso,
 				midTorso,lowTorso,pelvis,rightHip,leftHip };
 
 			for (auto const aimpoint : hitboxes)

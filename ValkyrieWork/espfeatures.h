@@ -13,6 +13,7 @@ namespace valkyrie
 		EspFeature(FeatureSet* fs) : Feature(fs) {}
 		mutable CSPlayer const* player;
 		mutable uint8_t index;
+		mutable uint8_t payloadIndex;
 	};
 
 	class BoxEsp : public EspFeature

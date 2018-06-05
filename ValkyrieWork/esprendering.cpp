@@ -51,6 +51,11 @@ namespace renderer
 
 	struct TextStack
 	{
+		TextStack(const size_t reserve)
+		{
+			lines.reserve(reserve);
+		}
+
 		//t1: text ptr
 		//t2: isWide (false if MB)
 		//t3: text color
@@ -252,8 +257,8 @@ namespace renderer
 		const hsv healthHsv = { healthHue, 0.75f, 1.f };
 		const rgb healthRgb = pRenderer->hsv2rgb(healthHsv);
 		return color(static_cast<uint8_t>(healthRgb.r * 255.f),
-			static_cast<uint8_t>(healthRgb.r * 255.f),
-			static_cast<uint8_t>(healthRgb.r * 255.f),
+			static_cast<uint8_t>(healthRgb.g * 255.f),
+			static_cast<uint8_t>(healthRgb.b * 255.f),
 			0xFFui8);
 	}
 
@@ -261,8 +266,7 @@ namespace renderer
 	{
 		//EDITME
 		ColorConfig const& ccfg = colorConfigs[0];
-		TextStack textStackRender;
-		textStackRender.lines.reserve(3u);
+		TextStack textStackRender(3);
 
 		for (auto a = 0u; a < payload.numPlayers; a++)
 		{
