@@ -19,11 +19,6 @@ namespace valkyrie
 	string WeaponEsp::featureName = "Weapon ESP";
 	string EspFeatureSet::setName = "ESP";
 
-	static bool checkVisible(CSPlayer const& target, vec3 const& camera)
-	{
-		std::array<vec3, 8> positions;
-
-	}
 
 	static auto getVertices(vec3 const& maxes, vec3 const& mins, std::array<vec3, 8>& vOut)
 	{
@@ -39,6 +34,19 @@ namespace valkyrie
 		vOut[7] = vec3(mins.x, mins.y + dims.y, mins.z + dims.z);
 	}
 
+	static auto checkVisible(CSPlayer const& target) -> bool
+	{
+		std::array<vec3, 8> positions;
+		getVertices(target.bboxMax + target.pos, target.bboxMin + target.pos, positions);
+		bool ret = false;
+		for (vec3 const& v : positions)
+		{
+			vec2 temp;
+			ret |= worldToScreen(v, temp, getViewMatrix());
+		}
+		return ret;
+	}
+
 	static auto rotateZ(vec3& vec, const float angle)
 	{
 		vec2 temp = vec2(vec.x, vec.y).rotate(toRad(angle));
@@ -51,7 +59,7 @@ namespace valkyrie
 		matrix_t viewMat)
 	{
 		oMins.x = oMins.y = std::numeric_limits<float>::max();
-		oMaxes.x = oMaxes.y = std::numeric_limits<float>::min();
+		oMaxes.x = oMaxes.y = -std::numeric_limits<float>::max();
 
 		std::array<vec3, 8> vertices3;
 		getVertices(maxes, mins, vertices3);
@@ -222,7 +230,7 @@ namespace valkyrie
 					continue;
 				}
 
-				if (shouldDraw)
+				if (checkVisible(player))
 				{
 					buffer.shouldDraw = true;
 

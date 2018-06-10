@@ -1,5 +1,6 @@
 #include "res.h"
 #include "globals.h"
+#include "pplib.h"
 
 #include "valkAPI.h"
 #include "memory.h"
@@ -28,6 +29,13 @@ static std::mutex payloadMutex;
 using namespace valkyrie;
 
 typedef std::tuple<HWND, LPDIRECT3D9, LPDIRECT3DDEVICE9> WindowTuple_t;
+
+BOOL __stdcall destroyHWND(void* hwnd)
+{
+	return DestroyWindow(reinterpret_cast<HWND>(hwnd));
+}
+typedef BOOL(__stdcall *DestroyWindow_t)(void*);
+using WindowHandle = std::unique_ptr<std::remove_pointer_t<HANDLE>, DestroyWindow_t>;
 
 template<typename T>
 using DXObject = std::unique_ptr<std::remove_pointer_t<T>, void(*)(T)>;
@@ -86,7 +94,7 @@ static auto createD3DWindow(string const& title) -> WindowTuple_t
 			break;
 		case WM_DESTROY:
 			//re-enable if not closing...
-			//PostQuitMessage(0);
+			PostQuitMessage(0);
 			break;
 		default:
 			return DefWindowProc(hwnd, message, wParam, lParam);
@@ -136,6 +144,12 @@ static auto createD3DWindow(string const& title) -> WindowTuple_t
 //TODO: me
 static auto pplifyMe() -> bool 
 {
+	if (!Init())
+	{
+		return false;
+	}
+	ElevatePPL();
+	CleanUp();
 	return true;
 }
 
@@ -237,17 +251,19 @@ static auto manageCSGOMemory() -> void
 
 		std::this_thread::sleep_for(std::chrono::milliseconds(threadSleepTime));
 	}
+
+	mainThreadState = false;
 }
 
 int WINAPI WinMain(HINSTANCE hInst, HINSTANCE hPrevInstance, LPSTR lpCmdLine, int nCmdShow)
 {
-	valkyrie::openConsole();
+	//valkyrie::openConsole();
 	//don't do if csgo exists
-	//if (ProcessMgr32::checkProcessExists("csgo.exe", true))
-	//{
-	//	PRINT_LOG("CSGO is running");
-	//	return -1;
-	//}
+	if (ProcessMgr32::checkProcessExists("csgo.exe", true))
+	{
+		PRINT_LOG("CSGO is running");
+		return -1;
+	}
 
 	globals.screenWidth = GetSystemMetrics(SM_CXSCREEN);
 	globals.screenHeight = GetSystemMetrics(SM_CYSCREEN);
@@ -262,7 +278,7 @@ int WINAPI WinMain(HINSTANCE hInst, HINSTANCE hPrevInstance, LPSTR lpCmdLine, in
 	}
 
 	//init window
-	WindowsHandle hwnd = WindowsHandle(std::get<0>(windowData), CloseHandle);
+	WindowHandle hwnd = WindowHandle(std::get<0>(windowData), destroyHWND);
 	auto directX = DXObject<LPDIRECT3D9>(std::get<1>(windowData), ReleaseDXObject<LPDIRECT3D9>);
 	auto dxDevice = DXObject<LPDIRECT3DDEVICE9>(std::get<2>(windowData), ReleaseDXObject<LPDIRECT3DDEVICE9>);
 
@@ -302,7 +318,6 @@ int WINAPI WinMain(HINSTANCE hInst, HINSTANCE hPrevInstance, LPSTR lpCmdLine, in
 
 	//ensure our memory thread exited cleanly
 	memThread.join();
-
 	//OK exit
 	return 0;
 }

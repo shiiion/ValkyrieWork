@@ -8,6 +8,8 @@
 
 #include "Renderer.h"
 
+#include "Menu.h"
+
 namespace renderer
 {
 	using std::vector;
@@ -265,7 +267,7 @@ namespace renderer
 	auto drawESP(valkyrie::ESPPayload const& payload) -> void
 	{
 		//EDITME
-		ColorConfig const& ccfg = colorConfigs[0];
+		ColorConfig const& ccfg = colorConfigs[menu::Menu.ESPColorScheme];
 		TextStack textStackRender(3);
 
 		for (auto a = 0u; a < payload.numPlayers; a++)
